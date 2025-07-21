@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7423017b-45cd-48b0-a5fd-91cb77bb33df" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/SeleniumFramework_Python.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/chrome/linux/chromedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/chrome/mac/chromedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/chrome/windows/chromedriver.exe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/edge/linux/msedgedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/edge/mac/msedgedriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/edge/windows/msedgedriver.exe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/firefox/linux/geckodriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/firefox/mac/geckodriver" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/libs/firefox/windows/geckodriver.exe" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/base/BasePage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/base/Browser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/base/BrowserSetup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/base/BrowserType.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/base/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/data/test_SwagLabsTest.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/pageObjects/SwagLabs/Header.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/pageObjects/SwagLabs/InventoryPage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/pageObjects/SwagLabs/LoginPage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/pageObjects/SwagLabs/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/test/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/test/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/test/test_SwagLabsInventoryTest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/test/test_SwagLabsLoginTest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/utilities/ExcelUtil.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/utilities/JsonUtil.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/python/com/selenium/framework/utilities/__init__.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2zYnUXsiAi5WqGIKASLQWq8uEi4" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python tests.Python tests for test_SwagLabsInventoryTest.test_SwagLabsInventoryTest.executor": "Debug",
+    "Python tests.Python tests for test_SwagLabsLoginTest.test_SwagLabsTest.executor": "Debug",
+    "Python.demoBrowser.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "C:/Users/melvi/PycharmProjects/SeleniumFramework_Python/libs/firefox/linux",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.CommitDialog",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\libs\firefox\linux" />
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\libs\firefox\mac" />
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\libs\firefox\windows" />
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\libs\edge\linux" />
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\libs\edge\mac" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\melvi\PycharmProjects\SeleniumFramework_Python\src\main\python\com\selenium\framework" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python tests.Python tests for test_SwagLabsInventoryTest.test_SwagLabsInventoryTest">
+    <configuration name="Python tests for test_SwagLabsInventoryTest.test_SwagLabsInventoryTest" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="SeleniumFramework_Python" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/main/python/com/selenium/framework/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_SwagLabsInventoryTest.test_SwagLabsInventoryTest&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_SwagLabsLoginTest.test_SwagLabsTest" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="SeleniumFramework_Python" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/main/python/com/selenium/framework/test" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_SwagLabsLoginTest.test_SwagLabsTest&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pytest in test" type="tests" factoryName="py.test" nameIsGenerated="true">
+      <module name="SeleniumFramework_Python" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.13" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_keywords" value="&quot;&quot;" />
+      <option name="_new_parameters" value="&quot;&quot;" />
+      <option name="_new_additionalArguments" value="&quot;pytest -m smoke --browser_name chrome --html\u003dreports/report.html&quot;" />
+      <option name="_new_target" value="&quot;C:\\Users\\melvi\\PycharmProjects\\SeleniumFramework_Python\\src\\main\\python\\com\\selenium\\framework\\test&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python tests.pytest in test" />
+      <item itemvalue="Python tests.Python tests for test_SwagLabsInventoryTest.test_SwagLabsInventoryTest" />
+      <item itemvalue="Python tests.Python tests for test_SwagLabsLoginTest.test_SwagLabsTest" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests for test_SwagLabsInventoryTest.test_SwagLabsInventoryTest" />
+        <item itemvalue="Python tests.Python tests for test_SwagLabsLoginTest.test_SwagLabsTest" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-b26f3e71634d-JavaScript-PY-251.26094.141" />
+        <option value="bundled-python-sdk-9f8e2b94138c-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.26094.141" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7423017b-45cd-48b0-a5fd-91cb77bb33df" name="Changes" comment="" />
+      <created>1751916890118</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1751916890118</updated>
+      <workItem from="1751916891720" duration="3973000" />
+      <workItem from="1752153215411" duration="87093000" />
+      <workItem from="1752849483100" duration="26610000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CHECK_NEW_TODO" value="false" />
+    <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
+    <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/main/python/com/selenium/framework/base/BasePage.py</url>
+          <line>416</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/SeleniumFramework_Python$demoBrowser.coverage" NAME="demoBrowser Coverage Results" MODIFIED="1752085221184" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/SeleniumFramework_Python$.coverage" NAME=" Coverage Results" MODIFIED="1753060067376" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/main/python/com/selenium/framework/test" />
+  </component>
+</project>
