@@ -77,58 +77,63 @@ bp_is_checked(element, description = None)
     is included, the function will print a log of the web driver action and if the element is checked or not to the
     console.
 bp_is_displayed(element, description = None)
-    Overrides the PageFactory is_displayed() function. This function first checks if the element is visible, then returns a
-    boolean representing if the element is displayed. If a description is included, the function will print a log of the web
-    driver action and if the element is displayed or not to the console.
+    Overrides the PageFactory is_displayed() function. This function first checks if the element is visible,
+    then returns a    boolean representing if the element is displayed. If a description is included, the function will
+     print a log of the web driver action and if the element is displayed or not to the console.
 bp_is_enabled(element, description = None)
-    Overrides the PageFactory is_enabled() function. This function first checks if the element is visible and then returns a
-    boolean representing if the element is enabled. If a description is included, the function will print a log of the web
-    driver action and if the element is enabled or not to the console.
+    Overrides the PageFactory is_enabled() function. This function first checks if the element is visible and then
+    returns a    boolean representing if the element is enabled. If a description is included, the function will print
+    a log of the web    driver action and if the element is enabled or not to the console.
 bp_select_from_dropdown_list(element, text, description = None)
-    Overrides the PageFactory select_element_by_text and select_element_by_value functions. Element must have a [select] html tag.
-    This function first checks if the element is visible. If the text entered is a String, it will call the PageFactory
-    select_element_by_text function. Otherwise, it will call the PageFactory select_element_by_value function. If a description is
-    entered, the function will print a log of the web driver action and what value was selected from the dropdown list.
+    Overrides the PageFactory select_element_by_text and select_element_by_value functions. Element must have a [select]
+    html tag. This function first checks if the element is visible. If the text entered is a String, it will call the
+    PageFactory select_element_by_text function. Otherwise, it will call the PageFactory select_element_by_value
+    function. If a description is entered, the function will print a log of the web driver action and what value was
+    selected from the dropdown list.
 bp_select_from_dropdown_list_using_index(element, index, description = None)
-    Overrides the PageFactory select_element_by_index function. The function first checks if the element is visible. It will then
-    call the PageFactory select_element_by_index function. If a description is
-    entered, the function will print a log of the web driver action and what index was selected from the dropdown list.
+    Overrides the PageFactory select_element_by_index function. The function first checks if the element is visible.
+    It will then call the PageFactory select_element_by_index function. If a description is entered, the function will
+    print a log of the web driver action and what index was selected from the dropdown list.
 bp_get_num_items_from_dropdown_list(element, description = None)
-    Overrides the PageFactory get_list_item_count function. The function first checks if the element is visible. It will then
-    call the PageFactory get_list_item_count function and return an int representing the number of items in the list. If a description is
-    entered, the function will print a log of the web driver action and the number of items found in the dropdown list.
+    Overrides the PageFactory get_list_item_count function. The function first checks if the element is visible. It will
+    then call the PageFactory get_list_item_count function and return an int representing the number of items in the
+    list. If a description is entered, the function will print a log of the web driver action and the number of items
+    found in the dropdown list.
 bp_get_all_items_from_dropdown_list(element, description = None)
-    Overrides the PageFactory get_all_list_item function. The function first checks if the element is visible. It will then
-    call the PageFactory get_all_list_item function and return an List[WebElement] representing all of the items in the list. If a description is
-    entered, the function will print a log of the web driver action.
+    Overrides the PageFactory get_all_list_item function. The function first checks if the element is visible. It will
+    then call the PageFactory get_all_list_item function and return an List[WebElement] representing all of the items
+    in the list. If a description is entered, the function will print a log of the web driver action.
 bp_deselect_all_items_from_dropdown_list(element, description = None)
     Overrides the PageFactory deselect_all function. The function first checks if the element is visible. It will then
-    call the PageFactory deselect_all function. If a description is entered, the function will print a log of the web driver action.
+    call the PageFactory deselect_all function. If a description is entered, the function will print a log of the web
+    driver action.
 bp_move_to_element(element, description = None)
-    Function to move to a given element on the page using Javascript. If a description is entered, the function will print a log of the
-    web driver action to the console.
+    Function to move to a given element on the page using Javascript. If a description is entered, the function will
+    print a log of the web driver action to the console.
 bp_scroll_down()
     Function to scroll down the page by (0, 3000). Function will print a log of the scroll down action to the console.
 bp_scroll_by_amount(x, y)
     Function to scroll down the page by (x, y). Function will print a log of the scroll down action to the console.
 bp_scroll_to_bottom_of_page()
-    Function to scroll down to the bottom of the web page. Function will print a log of the scroll down action to the console.
+    Function to scroll down to the bottom of the web page. Function will print a log of the scroll down action to the
+    console.
 bp_scroll_to_top_of_page()
     Function to scroll to the top of the web page. Function will print a log of the scroll function to the console.
 bp_enter_random_text(element, text_length = 15, description = None)
-    Function to enter a randomly generated String. Length of string set to text_length (default = 15 characters). If a description is included, a log
-    of the action will be printed to the console along with the randomly generated word.
+    Function to enter a randomly generated String. Length of string set to text_length (default = 15 characters). If a
+    description is included, a log of the action will be printed to the console along with the randomly generated word.
 bp_return_todays_date()
     Static method to return the current date and time.
 bp_handle_alert(accept_or_dismiss = True)
-    Function to handle a web page popup alert. If the accept_or_dismiss parameter = True, function will accept the alert, otherwise, it will dismiss the
-    alert (default is True). Log of action will be written to the console.
+    Function to handle a web page popup alert. If the accept_or_dismiss parameter = True, function will accept the
+    alert, otherwise, it will dismiss the alert (default is True). Log of action will be written to the console.
 bp_switch_to_new_window(num_windows_open = 0)
-    Function to switch to a new web browser tab. Function will first wait for the expected number of windows to be num_windows_open + 1 (num_windows_open
-    defaults to 0). It will then switch to num_windows_open+1 and print a log to the console.
+    Function to switch to a new web browser tab. Function will first wait for the expected number of windows to be
+    num_windows_open + 1 (num_windows_open defaults to 0). It will then switch to num_windows_open+1 and print a log to
+    the console.
 bp_close_popup_window(num_windows_to_be_open = 1)
-    Function to close a popup window. num_windows_to_be_open can be used if there are more than 2 windows open. This parameter will throw an exception if the value
-    entered is less than 1
+    Function to close a popup window. num_windows_to_be_open can be used if there are more than 2 windows open. This
+    parameter will throw an exception if the value entered is less than 1
 bp_browser_back()
     Function to hit the BACK button on the web browser.
 bp_browser_forward()
@@ -138,9 +143,10 @@ bp_browser_refresh()
 bp_browser_close()
     Function to close the web browser
 bp_verify_column_sorting(column, asc_or_desc = "asc", description = None)
-    Function to verify the sorting of a column of type List[WebElement]. Function will make a copy of the list, and perform a sort either ascending or descending based
-    on the asc_or_desc parameter (defaults to asc), and then compare the lists. If the lists are equal, the function returns True, otherwise it returns False and will
-    print both lists to the console.
+    Function to verify the sorting of a column of type List[WebElement]. Function will make a copy of the list, and
+    perform a sort either ascending or descending based on the asc_or_desc parameter (defaults to asc), and then compare
+    the lists. If the lists are equal, the function returns True, otherwise it returns False and will print both lists
+    to the console.
 bp_switch_to_frame(iframe)
     Switches the browser to the frame given by the iframe parameter. Web element must have the [iframe] HTML tag.
 bp_switch_to_default_content()
@@ -148,7 +154,8 @@ bp_switch_to_default_content()
 bp_get_browser_title()
     Returns a String value of the title found in the browser. Also prints the title to the console.
 bp_wait_for_page_to_load()
-    Function to wait until the web page is completely loaded. Function will print to the console the time needed to load the web page.
+    Function to wait until the web page is completely loaded. Function will print to the console the time needed to load
+    the web page.
 bp_print_timestamp()
     Function to print the current timestamp.
 generate_random_string(string_length)
@@ -156,7 +163,8 @@ generate_random_string(string_length)
 bp_verify_url(expected_url)
     Function to verify the current URL of the driver against the expected URL
 bp_handle_error(e, error_text)
-    Function to standardize error reporting, with e being the exception and error_text describing the error. Function will also print the stack trace.
+    Function to standardize error reporting, with e being the exception and error_text describing the error. Function
+    will also print the stack trace.
 """
 
     def __init__(self, driver):
@@ -288,7 +296,8 @@ bp_handle_error(e, error_text)
         self.element.visibility_of_element_located()
         if description:
             print(
-                f"{self.bp_print_timestamp()} | Number of items in {description} dropdown list: {self.element.get_num_of_items()}")
+                f"{self.bp_print_timestamp()} | Number of items in {description} dropdown list:"
+                f" {self.element.get_num_of_items()}")
         return self.element.get_list_item_count()
 
     def bp_get_all_items_from_dropdown_list(self, element, description=None):
@@ -383,7 +392,8 @@ bp_handle_error(e, error_text)
         print(f"{self.bp_print_timestamp()} | Switch to new window: {num_windows_open + 1}")
 
     def bp_close_popup_window(self, num_windows_to_be_open=1):
-        if num_windows_to_be_open < 1: raise Exception("num_windows_to_be_open must be 1 or greater")
+        if num_windows_to_be_open < 1:
+            raise Exception("num_windows_to_be_open must be 1 or greater")
         windows_opened = self.driver.window_handles
         self.bp_browser_close()
         self.driver.switch_to.window(windows_opened[num_windows_to_be_open - 1])
@@ -417,12 +427,14 @@ bp_handle_error(e, error_text)
         if sorted_list == original_list:
             if description:
                 print(
-                    f"{self.bp_print_timestamp()} | TRUE: Sorting column {description} by {asc_or_desc} order verified.")
+                    f"{self.bp_print_timestamp()} | TRUE: Sorting column {description} by {asc_or_desc} order"
+                    f" verified.")
             return True
         else:
             if description:
                 print(
-                    f"{self.bp_print_timestamp()} | FALSE: Sorting column {description} by {asc_or_desc} order NOT verified.")
+                    f"{self.bp_print_timestamp()} | FALSE: Sorting column {description} by {asc_or_desc} order NOT"
+                    f" verified.")
             else:
                 print(f"{self.bp_print_timestamp()} | FALSE: Sorting column by {asc_or_desc} order NOT verified.")
             print("Original list:")
