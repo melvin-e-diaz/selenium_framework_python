@@ -6,7 +6,7 @@ from src.main.python.com.selenium.framework.utilities.JsonUtil import JsonUtil
 
 
 @pytest.mark.smoke
-def test_SwagLabsTest(setup, file_path=None):
+def test_swag_labs_test(setup, file_path=None):
     _driver = setup
     test_list_item = None
     if file_path is None:
