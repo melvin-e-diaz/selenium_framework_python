@@ -1,9 +1,9 @@
-import os
+import time
+from datetime import datetime
 
 import pytest
 
-# from src.main.python.com.selenium.framework.base.BrowserSetup import BrowserSetup
-from selenium_framework_python.src.main.python.com.selenium.framework.base.BrowserSetup import BrowserSetup
+from src.main.python.com.selenium.framework.base.BrowserSetup import BrowserSetup
 
 driver = None
 
@@ -97,4 +97,3 @@ def take_screenshot(driver, nodeid):
     time.sleep(1)
     file_name = f'{nodeid}_{datetime.today().strftime("%Y-%m-%d_%H:%M")}.png'.replace("/", "_").replace("::", "__")
     driver.save_screenshot(file_name)
-

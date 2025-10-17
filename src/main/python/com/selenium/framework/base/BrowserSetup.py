@@ -66,7 +66,7 @@ class BrowserSetup(BasePage):
         browser_service = None
         var1 = browser
         var2 = None
-        beginningPath = "C:/Users/melvi/PycharmProjects/SeleniumFramework_Python"  # change this to your local path
+        beginning_path = "/home/mel/PycharmProjects/selenium_framework_python"  # change this to your local path
         match browser:
             case "chrome":
                 var2 = browser
@@ -76,9 +76,9 @@ class BrowserSetup(BasePage):
                 var2 = "gecko"
         match platform.system():
             case "Windows":
-                browser_service = Service(f"{beginningPath}/libs/{var1}/windows/{var2}driver.exe")
+                browser_service = Service(f"{beginning_path}/libs/{var1}/windows/{var2}driver.exe")
             case "Linux":
-                browser_service = Service(f"{beginningPath}/libs/{var1}/linux/{var2}driver")
+                browser_service = Service(f"{beginning_path}/libs/{var1}/linux/{var2}driver")
             case "Darwin":
-                browser_service = Service(f"{beginningPath}/libs/{var1}/mac/{var2}driver")
+                browser_service = Service(f"{beginning_path}/libs/{var1}/mac/{var2}driver")
         return browser_service
