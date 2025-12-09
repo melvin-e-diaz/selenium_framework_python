@@ -12,22 +12,30 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v2
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v2
         with:
-          python-version: '3.11'
+          python-version: 3.12
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # Install Chrome & ChromeDriver
-          sudo apt-get update
-          sudo apt-get install -y chromium-browser chromium-chromedriver
 
-      - name: Run Selenium tests
-        env:
-          PATH: /usr/lib/chromium-browser/:$PATH
-        run: pytest --maxfail=1 --disable-warnings -q
+      - name: Install Chrome and chromedriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y chromedriver
+
+      - name: Run tests with pytest
+        run: |
+          pytest --maxfail=1 --disable-warnings -q --html=report.html
+
+      - name: Upload test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-report
+          path: report.html
