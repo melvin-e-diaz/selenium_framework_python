@@ -475,7 +475,7 @@ bp_handle_error(e, error_text)
     def generate_random_string(string_length):
         """Generates a random string of specified length using letters and digits."""
         characters = string.ascii_letters + string.digits  # Includes uppercase, lowercase letters, and digits
-        random_string = ''.join(random.choice(characters) for i in range(string_length))
+        random_string = ''.join(random.choice(characters) for _ in range(string_length))
         return random_string
 
     def bp_verify_url(self, expected_url):
@@ -487,6 +487,6 @@ bp_handle_error(e, error_text)
             print(f"{self.bp_print_timestamp()} | URL not verified: Expected: {expected_url} | Actual: {actual_url}")
             return False
 
-    def bp_handle_error(self, e, error_text):
+    def bp_handle_error(self, error_text):
         print(f"{self.bp_print_timestamp()} | ERROR: | {error_text}")
         traceback.print_exc()
