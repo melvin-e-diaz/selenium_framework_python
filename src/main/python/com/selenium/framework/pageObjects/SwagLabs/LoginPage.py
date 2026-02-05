@@ -1,7 +1,10 @@
 import traceback
 
-from src.main.python.com.selenium.framework.base.BasePage import BasePage
-from src.main.python.com.selenium.framework.pageObjects.SwagLabs.InventoryPage import InventoryPage
+# from src.main.python.com.selenium.framework.base.BasePage import BasePage
+# from src.main.python.com.selenium.framework.pageObjects.SwagLabs.InventoryPage import InventoryPage
+from selenium_framework_python.src.main.python.com.selenium.framework.base.BasePage import BasePage
+from selenium_framework_python.src.main.python.com.selenium.framework.pageObjects.SwagLabs.InventoryPage import \
+    InventoryPage
 
 
 class LoginPage(BasePage):
