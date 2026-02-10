@@ -5,8 +5,12 @@ import time
 import traceback
 from datetime import date
 from datetime import datetime
+from typing import Optional, List
+from xmlrpc.client import DateTime
 
+from pyarrow.types import is_integer
 from selenium.webdriver import ActionChains
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.support.wait import WebDriverWait
@@ -35,458 +39,792 @@ mobile_test: Boolean
 
 Methods
 -------
-bp_click(element, description = None)
-    Overrides the PageFactory click function. Function first checks if the element is clickable
-    and highlights the element before clicking the button. If a description is included, the
-    function will print a log of the web driver action to the console.
-bp_right_click(element, description = None)
-    Overrides the PageFactory right click function. Function first checks if the element is clickable
-    and highlights the element before performing a right_click. If a description is included, the
-    function will print a log of the web driver action to the console.
-bp_double_click(element, description = None)
-    Overrides the PageFactory double click function. Function first checks if the element is clickable
-    and highlights the element before performing a double_click. If a description is included, the
-    function will print a log of the web driver action to the console.
-bp_click_and_hold(element, description = None)
-    Overrides the PageFactory click_and_hold function. Function first checks if the element is clickable
-    and highlights the element before performing a click_and_hold. If a description is included, the
-    function will print a log of the web driver action to the console.
-bp_release_click(element, description = None)
-    Overrides the PageFactory release_click function. Function highlights the element before performing a
-    release_click. If a description is included, the function will print a log of the web driver action
-    to the console.
-bp_mouse_hover(element, description = None)
-    Overrides the PageFactory mouse_hover function. Function highlights the element before performing a
-    mouse_hover. If a description is included, the function will print a log of the web driver action to
-    the console.
-bp_mouse_hover_with_offset(self, element, x, y, description = None)
-    Overrides the PageFactory mouse_hover function. Function highlights the element before performing a
-    mouse_hover to the coordinates x and y. If a description is included, the function will print a log
-    of the web driver action to the console.
-bp_write_text(element, text, description = None)
-    Overrides the PageFactory set_text function. Function first checks if the element is visible, then
-    highlights the element, clears the element, and then writes the text given in the text parameter. If
-    a description is included, the function will print a log of the web action to the console.
-bp_get_text(element, text, description = None)
-    Overrides the PageFactory get_text() function. Function first checks for the visibility of the element,
-    then returns the text found in the web element. If a description is included, the function will print a log
-    of the web driver action and the text returned to the console.
-bp_is_checked(element, description = None)
-    Overrides the PageFactory is_checked() function. This function must be run on a checkbox or a radio button.
-    Function first checks for visibility of the element, then returns whether the element is checked. If a description
-    is included, the function will print a log of the web driver action and if the element is checked or not to the
-    console.
-bp_is_displayed(element, description = None)
-    Overrides the PageFactory is_displayed() function. This function first checks if the element is visible,
-    then returns a    boolean representing if the element is displayed. If a description is included, the function will
-     print a log of the web driver action and if the element is displayed or not to the console.
-bp_is_enabled(element, description = None)
-    Overrides the PageFactory is_enabled() function. This function first checks if the element is visible and then
-    returns a    boolean representing if the element is enabled. If a description is included, the function will print
-    a log of the web    driver action and if the element is enabled or not to the console.
-bp_select_from_dropdown_list(element, text, description = None)
-    Overrides the PageFactory select_element_by_text and select_element_by_value functions. Element must have a [select]
-    html tag. This function first checks if the element is visible. If the text entered is a String, it will call the
-    PageFactory select_element_by_text function. Otherwise, it will call the PageFactory select_element_by_value
-    function. If a description is entered, the function will print a log of the web driver action and what value was
-    selected from the dropdown list.
-bp_select_from_dropdown_list_using_index(element, index, description = None)
-    Overrides the PageFactory select_element_by_index function. The function first checks if the element is visible.
-    It will then call the PageFactory select_element_by_index function. If a description is entered, the function will
-    print a log of the web driver action and what index was selected from the dropdown list.
-bp_get_num_items_from_dropdown_list(element, description = None)
-    Overrides the PageFactory get_list_item_count function. The function first checks if the element is visible. It will
-    then call the PageFactory get_list_item_count function and return an int representing the number of items in the
-    list. If a description is entered, the function will print a log of the web driver action and the number of items
-    found in the dropdown list.
-bp_get_all_items_from_dropdown_list(element, description = None)
-    Overrides the PageFactory get_all_list_item function. The function first checks if the element is visible. It will
-    then call the PageFactory get_all_list_item function and return an List[WebElement] representing all of the items
-    in the list. If a description is entered, the function will print a log of the web driver action.
-bp_deselect_all_items_from_dropdown_list(element, description = None)
-    Overrides the PageFactory deselect_all function. The function first checks if the element is visible. It will then
-    call the PageFactory deselect_all function. If a description is entered, the function will print a log of the web
-    driver action.
-bp_move_to_element(element, description = None)
-    Function to move to a given element on the page using Javascript. If a description is entered, the function will
-    print a log of the web driver action to the console.
-bp_scroll_down()
-    Function to scroll down the page by (0, 3000). Function will print a log of the scroll down action to the console.
-bp_scroll_by_amount(x, y)
-    Function to scroll down the page by (x, y). Function will print a log of the scroll down action to the console.
-bp_scroll_to_bottom_of_page()
-    Function to scroll down to the bottom of the web page. Function will print a log of the scroll down action to the
-    console.
-bp_scroll_to_top_of_page()
-    Function to scroll to the top of the web page. Function will print a log of the scroll function to the console.
-bp_enter_random_text(element, text_length = 15, description = None)
-    Function to enter a randomly generated String. Length of string set to text_length (default = 15 characters). If a
-    description is included, a log of the action will be printed to the console along with the randomly generated word.
-bp_return_todays_date()
-    Static method to return the current date and time.
-bp_handle_alert(accept_or_dismiss = True)
-    Function to handle a web page popup alert. If the accept_or_dismiss parameter = True, function will accept the
-    alert, otherwise, it will dismiss the alert (default is True). Log of action will be written to the console.
-bp_switch_to_new_window(num_windows_open = 0)
-    Function to switch to a new web browser tab. Function will first wait for the expected number of windows to be
-    num_windows_open + 1 (num_windows_open defaults to 0). It will then switch to num_windows_open+1 and print a log to
-    the console.
-bp_close_popup_window(num_windows_to_be_open = 1)
-    Function to close a popup window. num_windows_to_be_open can be used if there are more than 2 windows open. This
-    parameter will throw an exception if the value entered is less than 1
-bp_browser_back()
-    Function to hit the BACK button on the web browser.
-bp_browser_forward()
-    Function to hit the FORWARD button on the web browser.
-bp_browser_refresh()
-    Function to refresh the web browser.
-bp_browser_close()
-    Function to close the web browser
-bp_verify_column_sorting(column, asc_or_desc = "asc", description = None)
-    Function to verify the sorting of a column of type List[WebElement]. Function will make a copy of the list, and
-    perform a sort either ascending or descending based on the asc_or_desc parameter (defaults to asc), and then compare
-    the lists. If the lists are equal, the function returns True, otherwise it returns False and will print both lists
-    to the console.
-bp_switch_to_frame(iframe)
-    Switches the browser to the frame given by the iframe parameter. Web element must have the [iframe] HTML tag.
-bp_switch_to_default_content()
-    Switches the browser to the default content.
-bp_get_browser_title()
-    Returns a String value of the title found in the browser. Also prints the title to the console.
-bp_wait_for_page_to_load()
-    Function to wait until the web page is completely loaded. Function will print to the console the time needed to load
-    the web page.
-bp_print_timestamp()
-    Function to print the current timestamp.
-generate_random_string(string_length)
-    Function to generate a random string of specified length using letters and digits
-bp_verify_url(expected_url)
-    Function to verify the current URL of the driver against the expected URL
-bp_handle_error(e, error_text)
-    Function to standardize error reporting, with e being the exception and error_text describing the error. Function
-    will also print the stack trace.
+See individual method docstrings for detailed information.
 """
 
-    def __init__(self, driver):
+    # ============================================================================
+    # CONSTRUCTOR
+    # ============================================================================
+    def __init__(self, driver, wait_timeout=10, highlight=True, mobile_test=False):
+        """
+        Initialize the Selenium BasePage.
+
+        Parameters
+        ----------
+        driver: Selenium WebDriver instance
+        wait_timeout: Maximum time to wait for elements (default: 10 sec)
+        highlight: Whether to highlight elements during interactions (default: True)
+        mobile_test: Whether test is executed on mobile browser (not yet implemented; default: False)
+        """
         super().__init__()
         self.element = None
         self.driver = driver
-        self.wait = WebDriverWait(self.driver, 10)
-        self.highlight = True
-        self.mobile_test = False
+        self.wait = WebDriverWait(self.driver, wait_timeout)
+        self.highlight = highlight
+        self.mobile_test = mobile_test
 
-    def bp_click(self, element, description=None):
-        self.element = element
-        self.element.element_to_be_clickable()
-        self.highlight_web_element(element)
-        self.element.click_button()
+    # ============================================================================
+    # LOGGING FUNCTION
+    # ============================================================================
+    def _log(self, message, description: Optional[str] = None):
+        """
+        Internal method designed to consistently log actions.
+
+        Parameters
+        ----------
+        message: The action message to log.
+        description: Element description. Default: None
+        """
+        timestamp = self.bp_print_timestamp()
         if description:
-            print(f"{self.bp_print_timestamp()} | Clicked on element: {description}")
-
-    def bp_right_click(self, element, description=None):
-        self.element = element
-        self.element.element_to_be_clickable()
-        self.highlight_web_element(element)
-        self.element.context_click()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Right clicked on element: {description}")
-
-    def bp_double_click(self, element, description=None):
-        self.element = element
-        self.element.element_to_be_clickable()
-        self.highlight_web_element(element)
-        self.element.double_click()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Double clicked on element:{description}")
-
-    def bp_click_and_hold(self, element, description=None):
-        self.element = element
-        self.element.element_to_be_clickable()
-        self.highlight_web_element(element)
-        self.element.click_and_hold()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Click and hold on element:{description}")
-
-    def bp_release_click(self, element, description=None):
-        self.element = element
-        self.element.release()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Released click on element:{description}")
-
-    def bp_mouse_hover(self, element, description=None):
-        self.element = element
-        self.element.hover()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Mouse hover on element:{description}")
-
-    def bp_mouse_hover_with_offset(self, element, x, y, description=None):
-        self.element = element
-        self.element.hover_with_offset(x, y)
-        if description:
-            print(f"{self.bp_print_timestamp()} | Mouse hover on element:{description} with offset: {x},{y}")
-
-    def bp_write_text(self, element, text, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        self.highlight_web_element(element)
-        self.element.clear_text()
-        self.element.set_text(text)
-        if description:
-            print(f"{self.bp_print_timestamp()} | Write text {text} on element: {description}")
-
-    def bp_get_text(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if self.element.get_text and description:
-            print(f"{self.bp_print_timestamp()} | Returned text {self.element.get_text()} from element: {description}")
-        elif self.element.get_text is None and description:
-            print(f"{self.bp_print_timestamp()} | ERROR returning text from element: {description}")
-        return self.element.get_text()
-
-    def bp_is_checked(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if self.element.is_Checked() and description:
-            print(f"{self.bp_print_timestamp()} | Element checked is TRUE: {description}")
-        elif self.element.is_Checked() is False and description:
-            print(f"{self.bp_print_timestamp()} | Element checked is FALSE: {description}")
-        return self.element.is_Checked()
-
-    def bp_is_displayed(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            if self.element.is_displayed():
-                print(f"{self.bp_print_timestamp()} | Element displayed is TRUE: {description}")
-            else:
-                print(f"{self.bp_print_timestamp()} | ERROR: Element is NOT displayed: {description}")
-        return self.element.is_displayed()
-
-    def bp_is_enabled(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            if self.element.is_enabled():
-                print(f"{self.bp_print_timestamp()} | Element enabled is TRUE: {description}")
-            else:
-                print(f"{self.bp_print_timestamp()} | Element enabled is FALSE: {description}")
-        return self.element.is_enabled()
-
-    def bp_select_from_dropdown_list(self, element, text, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if isinstance(text, str):
-            self.element.select_element_by_text(text)
-            if description:
-                print(f"{self.bp_print_timestamp()} | Selected option {text} from element: {description}")
+            print(f"{timestamp} | {message}: {description}")
         else:
-            self.element.select_element_by_value(text)
-            if description:
-                print(f"{self.bp_print_timestamp()} | Selected value {text} from element: {description}")
+            print(f"{timestamp}) | {message}")
 
-    def bp_select_from_dropdown_list_using_index(self, element, index, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        self.element.select_element_by_index(index)
-        if description:
-            print(f"{self.bp_print_timestamp()} | Selected option with index: {index} from element: {description}")
+    # ============================================================================
+    # CLICK FUNCTIONS
+    # ============================================================================
+    def bp_click(self, element, description: Optional[str] = None, click_type="left"):
+        """
+        Function to handle clicking on a web element.
 
-    def bp_get_num_items_from_dropdown_list(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            print(
-                f"{self.bp_print_timestamp()} | Number of items in {description} dropdown list:"
-                f" {self.element.get_num_of_items()}")
-        return self.element.get_list_item_count()
+        Parameters
+        ----------
+        element: element to click
+        description: Description for logging purposes. Default=None
+        click_type: The type of click to be performed (left, right, double). Default=left
+        """
+        try:
+            element.element_to_be_clickable()
+            self.highlight_web_element(element)
+            match click_type.lower():
+                case "left":
+                    element.click_button()
+                case "right":
+                    element.context_click()
+                case "double":
+                    element.double_click()
+                case _:
+                    raise Exception(f"Invalid click_type entered: {click_type}")
+            self._log(f"{click_type} clicked on element", description)
+        except Exception as e:
+            self.bp_handle_error(f"Failed to {click_type} click {description or 'element'}: {e}")
+            raise
 
-    def bp_get_all_items_from_dropdown_list(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            print(f"{self.bp_print_timestamp()} | All items in {description} dropdown list:")
-        for item in self.element.get_all_list_item():
-            print(item)
-        return self.element.get_all_list_item()
+    def bp_click_and_hold(self, element, description: Optional[str] = None):
+        """
+        Function to click and hold on a web element.
 
-    def bp_get_selected_items_from_dropdown_list(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            print(f"{self.bp_print_timestamp()} | All selected items in {description} dropdown list:")
-        for item in self.element.get_list_selected_item():
-            print(item)
-        return self.element.get_list_selected_item()
+        Parameters
+        ----------
+        element: The element to be clicked on.
+        description: Optional description. Default=None
+        """
+        try:
+            element.element_to_be_clickable()
+            self.highlight_web_element(element)
+            element.click_and_hold()
+            self._log("Click and hold on element", description)
+        except Exception as e:
+            self.bp_handle_error(f"Failed to click and hold {description or 'element'}: {e}")
+            raise
 
-    def bp_verify_item_contained_in_dropdown_list(self, element, item, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        if description:
-            if self.element.verify_list_item(item):
-                print(f"{self.bp_print_timestamp()} | TRUE: Item {item} found in {description} dropdown list:")
+    def bp_release_click(self, element, description: Optional[str] = None):
+        """
+        Function to release a click that was previously held. Use in conjunction with the bp_click_and_hold() function.
+
+        Parameters
+        ----------
+        element: The element to be clicked on.
+        description: Optional description. Default=None
+        """
+        try:
+            element.release()
+            self._log("Released click on element", description)
+        except Exception as e:
+            self.bp_handle_error(f"Failed to click and hold {description or 'element'}: {e}")
+            raise
+
+    def bp_mouse_hover(self, element, description: Optional[str] = None, x: Optional[int | float] = None,
+                       y: Optional[int | float] = None, ):
+        """
+        Function to hover the mouse over a specific element with an optional offset.
+
+        Parameters
+        ----------
+        element: Web element to be hovered over.
+        description: Optional description for logging purposes. Default=None
+        x: X-axis offset. Default=None
+        y: Y-axis offset. Default=None
+        """
+        try:
+            self.highlight_web_element(element)
+            if x and y:
+                element.hover_with_offset(x, y)
+            elif x or y:
+                self._log("WARNING: One offset coordinate is missing. Please check the code. Running hover method with "
+                          "no offset.")
+                element.hover()
             else:
-                print(f"{self.bp_print_timestamp()} | FALSE: Item {item} NOT found in {description} dropdown list:")
-        return self.element.verify_list_item(item)
+                element.hover()
+            message = f"Mouse hover on element with offset ({x},{y})" if x and y else "Mouse hover on element"
+            self._log(message, description)
+        except Exception as e:
+            error_msg = f"Failed to hover over {description or 'element'} with offset ({x},{y})" if x and y else \
+                f"Failed to hover over {description or 'element'} "
+            self.bp_handle_error(f"{error_msg}: {e}")
 
-    def bp_deselect_all_items_from_dropdown_list(self, element, description=None):
-        self.element = element
-        self.element.visibility_of_element_located()
-        select = Select(element)
-        select.deselect_all()
-        if description:
-            print(f"{self.bp_print_timestamp()} | All items deselected from {description} dropdown list:")
+    # ============================================================================
+    # WRITE TEXT FUNCTION
+    # ============================================================================
+    def bp_write_text(self, element, text, description: Optional[str] = None, clear_text: Optional[bool] = True):
+        """
+        Function to write text to a web element.
 
-    def bp_move_to_element(self, element, description=None):
-        actions = ActionChains(self.driver)
-        actions.move_to_element(element).perform()
-        if description:
-            print(f"{self.bp_print_timestamp()} | Moved to element {description}")
+        Parameters
+        ----------
+        element: WebElement to write text to.
+        text: Text to be written to element.
+        description: Optional description for logging purposes. Default=None
+        clear_text: Flag that determines whether the text field should be cleared of any text before writing the text.
+            Default=True
+        """
+        try:
+            element.visibility_of_element_located()
+            self.highlight_web_element(element)
+            if clear_text:
+                element.clear_text()
+            element.set_text(text)
+            desc = description or "unknown element"
+            self._log(f"Wrote {text} to element {desc}")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to write text to {description or 'unknown element'}: {e}")
+            raise
 
-    def bp_scroll_down(self):
-        actions = ActionChains(self.driver)
-        actions.scroll_by_amount(0, 3000).perform()
-        print(f"{self.bp_print_timestamp()} | Scroll down")
+    # ============================================================================
+    # GET TEXT FUNCTION
+    # ============================================================================
+    def bp_get_text(self, element, description: Optional[str] = None, clear_text: Optional[bool] = True) -> str:
+        try:
+            element.visibility_of_element_located()
+            text = element.get_text()
+            if text:
+                self._log(f"Returned text '{text}' from element.", description or 'unknown element')
+            else:
+                self._log(f"WARNING: No text found in element.", description or 'unknown element')
+            return text
+        except Exception as e:
+            self.bp_handle_error(f"Failed to get text from {description or 'unknown element'}: {e}")
+            raise
 
-    def bp_scroll_by_amount(self, x, y):
-        actions = ActionChains(self.driver)
-        actions.scroll_by_amount(x, y).perform()
-        print(f"Scroll down by amount: {x} x {y}")
+    # ============================================================================
+    # VERIFICATION METHODS
+    # ============================================================================
+    def bp_is_checked(self, element, description: Optional[str] = None):
+        """
+        Function to check if a checkbox element is checked.
+        Parameters
+        ----------
+        element: Web Element representing the checkbox
+        description: Optional description for logging purposes. Default=None
 
-    def bp_scroll_to_bottom_of_page(self):
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        print(f"{self.bp_print_timestamp()} | Scroll to bottom of page")
+        Returns
+        -------
+        Boolean representing if the value is checked or not. Returns True if the value is checked, False if the value is
+        not checked.
+        """
+        try:
+            element.visibility_of_element_located()
+            is_checked = element.is_Checked()
+            self._log(f"Element checked status is {is_checked}", description or "unknown element")
+            return is_checked
+        except Exception as e:
+            self.bp_handle_error(f"Attempting to verify check/no check status failed for "
+                                 f"{description or 'unknown element'}: {e}")
 
-    def bp_scroll_to_top_of_page(self):
-        self.driver.execute_script("window.scrollTo(0, 0;")
-        print(f"{self.bp_print_timestamp()} | Scroll to top of page")
+    def bp_is_displayed(self, element, description: Optional[str] = None):
+        """
+        Function to check if a web element is displayed.
+        Parameters
+        ----------
+        element: Web Element to be checked.
+        description: Optional description. Default = none
 
-    def bp_enter_random_text(self, element, text_length=15, description=None):
-        self.element = element
-        self.element.element_to_be_clickable()
-        self.highlight_web_element(element)
-        random_text = self.generate_random_string(text_length)
-        self.bp_write_text(element, random_text)
-        if description:
-            print(f"{self.bp_print_timestamp()} | Entered random text: {random_text} into element: {description}")
+        Returns
+        -------
+        True if the web element is displayed on the page, False if the web element is not displayed on the page
+        """
+        try:
+            element.visibility_of_element_located()
+            is_displayed = element.is_displayed()
+            self._log(f"Element displayed is {is_displayed}", description or "unknown element")
+            return is_displayed
+        except Exception as e:
+            self.bp_handle_error(f"Attempting to verify displayed status failed for "
+                                 f"{description or 'unknown element'}: {e}")
+            raise
+
+    def bp_is_enabled(self, element, description: Optional[str] = None):
+        """
+        Function to verify if the web element is enabled on the page.
+
+        Parameters
+        ----------
+        element: Web Element to be checked.
+        description: Optional description. Default=None
+
+        Returns
+        -------
+        True if the element is enabled on the page, False otherwise.
+        """
+        try:
+            element.visibility_of_element_located()
+            is_enabled = element.is_enabled()
+            self._log(f"Element enabled is {is_enabled}", description or "unknown element")
+            return is_enabled
+        except Exception as e:
+            self.bp_handle_error(f"Attempting to verify enabled status failed for "
+                                 f"{description or 'unknown element'}: {e}")
+            raise
+
+    # ============================================================================
+    # DROPDOWN LIST METHODS
+    # ============================================================================
+    def bp_select_from_dropdown_list(self, element, text_or_value, description: Optional[str] = None,
+                                     select_by_index: Optional[bool] = False):
+        """
+        Function to select from a dropdown list. List defaults to selecting from a dropdown list by the value or text.
+        To select by the index, set select_by_index = True
+        Parameters
+        ----------
+        element: Web element to select.
+        text_or_value: Value to be selected from the dropdown list.
+        description: Optional description for logging purposes. Default=None
+        select_by_index: Optional bool to select by index instead of value. Default=False (select by value). Set to True
+            to select by index.
+        """
+        try:
+            element.visibility_of_element_located()
+            if select_by_index:
+                element.select_element_by_index(text_or_value)
+                self._log(f"Selected index {text_or_value} from element", description or 'unknown element')
+                return
+            elif isinstance(text_or_value, str):
+                element.select_element_by_text(text_or_value)
+            else:
+                element.select_element_by_value(text_or_value)
+            self._log(f"Selected option {text_or_value} from element", description or 'unknown element')
+        except Exception as e:
+            self.bp_handle_error(f"Failed to select option {text_or_value} from dropdown list "
+                                 f"{description or 'unknown element'}: {e}")
+
+    def bp_get_num_items_from_dropdown_list(self, element, description: Optional[str] = None) -> int:
+        """
+        Function to return the number of items present in a dropdown list.
+
+        Parameters
+        ----------
+        element: Web Element to be analyzed.
+        description: Optional description for logging purposes.
+
+        Returns
+        -------
+        num_items: int value representing the number of items
+        """
+        try:
+            element.visibility_of_element_located()
+            num_items = element.get_list_item_count()
+            self._log(f"Found {num_items} items in dropdown list.", description or "unknown element")
+            return num_items
+        except Exception as e:
+            self.bp_handle_error(f"Failed to return number of items in dropdown list {description or 'element'}: {e}")
+            raise
+
+    def bp_get_items_from_dropdown_list(self, element, description: Optional[str] = None,
+                                        selected_items: Optional[bool] = False) -> List[WebElement]:
+        """
+        Function to return items from a dropdown list. Use selected_items = True to return items that are selected from
+            a multi-select list instead of all items.
+
+        Parameters
+        ----------
+        element: WebElement target element
+        description: Optional description for logging. Default=None
+        selected_items: bool flag to return selected items instead of all items.
+
+        Returns
+        -------
+        List[WebElement] representing the elements returned from the dropdown list.
+        """
+        try:
+            element.visibility_of_element_located()
+            if selected_items:
+                items = element.get_list_selected_item()
+            else:
+                items = element.get_all_list_item()
+            if len(items) == 0:
+                self._log("WARNING: No items found in dropdown list", description or 'unknown list')
+            else:
+                self._log(f"{'Selected' if selected_items else 'All'} items found in dropdown list: ",
+                          description or 'unknown list')
+                for item in items:
+                    print(f"    - {item}")
+            return items
+        except Exception as e:
+            self.bp_handle_error(f"Failed to get items from {description or 'element'}: {e}")
+            raise
+
+    def bp_verify_item_present_in_dropdown_list(self, element, item, description: Optional[str] = None):
+        """
+        Function to verify if an item is present in a dropdown list.
+
+        Parameters
+        ----------
+        element: WebElement representing the target element.
+        item: item to verify if it is in dropdown list
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        is_found: bool True if item is found in dropdown list, False if not found.
+        """
+        try:
+            element.visibility_of_element_located()
+            is_present = element.verify_list_item(item)
+
+            self._log(f"{is_present}: Item {item} is {'present' if is_present else 'not present'} in dropdown list",
+                      description or 'unknown element')
+            return is_present
+        except Exception as e:
+            self.bp_handle_error(f"Failed to verify presence of item {item} in dropdown list "
+                                 f"{description or 'unknown element'}: {e}")
+            raise
+
+    def bp_deselect_all_items_from_dropdown_list(self, element, description: Optional[str] = None):
+        """
+        Function to deselect all items from a dropdown list.
+
+        Parameters
+        ----------
+        element: WebElement representing the target element.
+        description: Optional description for logging purposes. Default=None
+        """
+        try:
+            element.visibility_of_element_located()
+            select = Select(element)
+            select.deselect_all()
+            self._log("All items deselected from dropdown list.", description or 'unknown element')
+        except Exception as e:
+            self.bp_handle_error(f"Failed to deselect all items from {description or 'unknown element'}: {e}")
+            raise
+
+    # ============================================================================
+    # MOVE AND SCROLL METHODS
+    # ============================================================================
+    def bp_move_to_element(self, element, description: Optional[str] = None):
+        """
+        Function to move the screen to the target element.
+
+        Parameters
+        ----------
+        element: WebElement representing the target element.
+        description: Optional description for logging purposes. Default=None
+        """
+        try:
+            actions = ActionChains(self.driver)
+            actions.move_to_element(element).perform()
+            self._log("Moved to element", description or 'unknown element')
+        except Exception as e:
+            self.bp_handle_error(f"Failed to move to {description or 'unknown element'}: {e}")
+            raise
+
+    def bp_scroll(self, direction: Optional[str] = None, amount: Optional[int] = None, x: Optional[int] = None,
+                  y: Optional[int] = None, element=None):
+        """
+        Unified scroll function that handles all scroll operations.
+
+        Parameters:
+            direction: String specifying scroll direction - "up", "down", "left", "right",
+                      "top", "bottom". Mutually exclusive with x/y coordinates.
+            amount: Pixels to scroll when using direction (default: 3000 for up/down, 1000 for left/right)
+            x: Specific x-coordinate to scroll to (use with y for absolute positioning)
+            y: Specific y-coordinate to scroll to (use with x for absolute positioning)
+            element: WebElement to scroll to (brings element into view)
+
+        Examples:
+            bp_scroll(direction="down")  # Scroll down 3000px
+            bp_scroll(direction="up", amount=500)  # Scroll up 500px
+            bp_scroll(direction="top")  # Scroll to top of page
+            bp_scroll(direction="bottom")  # Scroll to bottom of page
+            bp_scroll(x=0, y=1000)  # Scroll to coordinates (0, 1000)
+            bp_scroll(element=some_element)  # Scroll element into view
+        """
+        try:
+            # Scroll to element
+            if element is not None:
+                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});",
+                                           element)
+                self._log_simple(f"Scrolled to element: {element}")
+                return
+
+            # Scroll to specific coordinates
+            if x is not None or y is not None:
+                scroll_x = x if x is not None else 0
+                scroll_y = y if y is not None else 0
+                self.driver.execute_script(f"window.scrollTo({scroll_x}, {scroll_y});")
+                timestamp = self.bp_print_timestamp()
+                print(f"{timestamp} | Scrolled to coordinates: x={scroll_x}, y={scroll_y}")
+                return
+
+            # Scroll by direction
+            if direction is None:
+                raise ValueError("Must specify either direction, coordinates (x, y), or element")
+
+            direction = direction.lower()
+
+            # Handle top/bottom special cases
+            if direction == "top":
+                self.driver.execute_script("window.scrollTo(0, 0);")
+                self._log_simple("Scrolled to top of page")
+                return
+
+            if direction == "bottom":
+                self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+                self._log_simple("Scrolled to bottom of page")
+                return
+
+            # Handle directional scrolling with ActionChains
+            scroll_map = {
+                "down": (0, amount or 3000),
+                "up": (0, -(amount or 3000)),
+                "right": (amount or 1000, 0),
+                "left": (-(amount or 1000), 0)
+            }
+
+            if direction not in scroll_map:
+                raise ValueError(f"Invalid direction: {direction}. Must be one of: up, down, left, right, top, bottom")
+
+            scroll_x, scroll_y = scroll_map[direction]
+            actions = ActionChains(self.driver)
+            actions.scroll_by_amount(scroll_x, scroll_y).perform()
+
+            timestamp = self.bp_print_timestamp()
+            print(f"{timestamp} | Scrolled {direction} by x={scroll_x}, y={scroll_y}")
+
+        except ValueError as ve:
+            # Re-raise ValueError with original message
+            raise ve
+        except Exception as e:
+            self.bp_handle_error(f"Failed to scroll: {e}")
+            raise
+
+    # def bp_enter_random_text(self, element, text_length: Optional[int] = 15, description: Optional[str] = None):
+    #     """
+    #     Function to enter randomly generated text into a web element
+    #
+    #     Parameters
+    #     ----------
+    #     element: WebElement representing the target element
+    #     text_length: Optional parameter to set the length of random text. Default=15
+    #     description: Optional text for logging purposes. Default=None
+    #     """
+    #     self.element = element
+    #     self.element.element_to_be_clickable()
+    #     self.highlight_web_element(element)
+    #     random_text = self.bp_generate_random_string(text_length)
+    #     self.bp_write_text(element, random_text)
+    #     if description:
+    #         print(f"{self.bp_print_timestamp()} | Entered random text: {random_text} into element: {description}")
 
     @staticmethod
-    def bp_return_todays_date():
+    def bp_return_todays_date() -> date:
+        """
+        Function to return today's date.
+        Returns
+        -------
+        date: Today's date
+        """
         return date.today()
 
-    def bp_handle_alert(self, accept_or_dismiss="accept"):
-        self.wait.until(expected_conditions.alert_is_present())
-        print(f"{self.bp_print_timestamp()} | Alert detected.")
-        alert = self.driver.switch_to.alert
-        print(alert.text)
-        if accept_or_dismiss == "accept":
-            alert.accept()
-            print(f"{self.bp_print_timestamp()} | Alert accepted.")
-        else:
-            alert.dismiss()
-            print(f"{self.bp_print_timestamp()} | Alert dismissed.")
+    def bp_handle_alert(self, dismiss: Optional[bool] = False):
+        """
+        Function to handle a popup alert. Set dismiss=False to dismiss the alert, otherwise the alert will be accepted.
 
-    def bp_switch_to_new_window(self, num_windows_open=0):
-        self.wait.until(expected_conditions.number_of_windows_to_be(num_windows_open + 2))
-        windows_opened = self.driver.window_handles
-        self.driver.switch_to.window(windows_opened[num_windows_open + 1])
-        print(f"{self.bp_print_timestamp()} | Switch to new window: {num_windows_open + 1}")
+        Parameters
+        ----------
+        dismiss: Optional bool. Set this to True for the alert to be dismissed, otherwise it will be accepted.
+        """
+        try:
+            self.wait.until(expected_conditions.alert_is_present())
+            self._log("Alert detected.")
 
-    def bp_close_popup_window(self, num_windows_to_be_open=1):
+            alert = self.driver.switch_to.alert
+            self._log("Alert text:", alert.text)
+
+            if dismiss:
+                alert.dismiss()
+                self._log("Alert dismissed.")
+            else:
+                alert.accept()
+                self._log("Alert accepted.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to handle alert: {e}")
+            raise
+
+    def bp_switch_to_new_window(self, num_windows_open: Optional[int] = 0):
+        """
+        Function to switch driver to a new window.
+
+        Parameters
+        ----------
+        num_windows_open: Int value representing the number of windows that are open. Default is 0
+        """
+        try:
+            self.wait.until(expected_conditions.number_of_windows_to_be(num_windows_open + 2))
+            windows_opened = self.driver.window_handles
+            self.driver.switch_to.window(windows_opened[num_windows_open + 1])
+            self._log(f"Switched to new window: {num_windows_open + 1}")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to switch to new window: {e}")
+            raise
+
+    def bp_close_popup_window(self, num_windows_to_be_open: Optional[int] = 1):
+        """
+        Function to close a popup window
+
+        Parameters
+        ----------
+        num_windows_to_be_open: int representing the number of windows expected to be open after the function has been
+        completed. Default=1
+        """
         if num_windows_to_be_open < 1:
-            raise Exception("num_windows_to_be_open must be 1 or greater")
-        windows_opened = self.driver.window_handles
-        self.bp_browser_close()
-        self.driver.switch_to.window(windows_opened[num_windows_to_be_open - 1])
-        print(f"{self.bp_print_timestamp()} | Closed popup window")
+            raise ValueError("ERROR: num_windows_to_be_open argument must be 1 or greater.")
+
+        try:
+            windows_opened = self.driver.window_handles
+            self.bp_browser_close()
+            self.driver.switch_to.window(windows_opened[num_windows_to_be_open - 1])
+            self._log("Closed popup window.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to close popup window: {e}")
+            raise
 
     def bp_browser_back(self):
-        self.driver.back()
-        print(f"{self.bp_print_timestamp()} | Browser back")
+        """
+        Function to select Back in the web browser.
+        """
+        try:
+            self.driver.back()
+            self._log("Browser back.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to navigate back in the browser: {e}")
+            raise
 
     def bp_browser_forward(self):
-        self.driver.forward()
-        print(f"{self.bp_print_timestamp()} | Browser forward")
+        """
+        Function to navigate forward in the web browser.
+        """
+        try:
+            self.driver.forward()
+            self._log("Browser forward.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to navigate forward in the browser: {e}")
 
     def bp_browser_refresh(self):
-        self.driver.refresh()
-        print(f"{self.bp_print_timestamp()} | Browser refresh")
+        """
+        Function to refresh the browser window.
+        """
+        try:
+            self.driver.refresh()
+            self._log("Browser refresh.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to refresh the browser: {e}")
 
     def bp_browser_close(self):
-        self.driver.close()
-        print(f"{self.bp_print_timestamp()} | Browser close")
+        """
+        Function to close the browser window.
+        """
+        try:
+            self.driver.close()
+            print(f"{self.bp_print_timestamp()} | Browser close")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to close the browser window: {e}")
 
-    def bp_verify_column_sorting(self, column, asc_or_desc="asc", description=None):
-        sorted_list = []
-        for counter in column:
-            sorted_list.append(counter.get_text())
-        original_list = sorted_list.copy()
-        if asc_or_desc == "asc":
-            sorted_list.sort()
+    def bp_verify_column_sorting(self, column, description: Optional[str] = None, reverse_sort: Optional[bool] = False,
+                                 sort_type: Optional[str] = 'string', date_format: Optional[str] = "%Y-%m-%d") -> bool:
+        """
+        Function to verify the sorting of a column in the UI versus sorting using Python's built-in sorting function.
+
+        Parameters
+        ----------
+        column: WebElement representing the column to be verified.
+        description: Optional description for logging purposes: Default=None
+        reverse_sort: Optional, bool to sort in descending order. Default=False (ascending order)
+        sort_type: Optional, str Determines method to sort function. Valid options are 'string', 'numeric', 'date'.
+            Default=string
+        date_format: Optional, str determines date format for sorting dates. Value must be a valid date format that can
+            be processed by the Python datetime library. Default="%Y-%m-%d"
+
+        Returns
+        -------
+        True if column sorting verified. False if column sorting is not verified.
+        """
+
+        # extract text from web elements and strip whitespace
+        original_list = [counter.get_text().strip() for counter in column]
+        sorted_list = original_list.copy()
+
+        try:
+            # sort based on type
+            if sort_type == "numeric":
+                sorted_list.sort(
+                    key=lambda x: float(x) if x and x.replace('.', '', 1).replace('-', '', 1).isdigit() else float(
+                        'inf'),
+                    reverse=reverse_sort)
+            elif sort_type == "date":
+                sorted_list.sort(
+                    key=lambda x: datetime.strptime(x, date_format) if x else datetime.min, reverse=reverse_sort)
+            else:  # string
+                sorted_list.sort(key=lambda x: x.lower() if x else "", reverse=reverse_sort)
+        except (ValueError, TypeError) as e:
+            self.bp_handle_error(f"Failed to sort column: {description or 'unknown column'} | {e}")
+            return False
+
+        # list comparison
+        is_sorted = (sorted_list == original_list)
+        asc_or_desc = 'descending' if reverse_sort else 'ascending'
+
+        if is_sorted:
+            self._log(f"TRUE: Column sorting verified in {asc_or_desc} order | Sort type: {sort_type}",
+                      description or 'unknown column')
         else:
-            sorted_list.sort(reverse=True)
-        if sorted_list == original_list:
-            if description:
-                print(
-                    f"{self.bp_print_timestamp()} | TRUE: Sorting column {description} by {asc_or_desc} order"
-                    f" verified.")
-            return True
-        else:
-            if description:
-                print(
-                    f"{self.bp_print_timestamp()} | FALSE: Sorting column {description} by {asc_or_desc} order NOT"
-                    f" verified.")
-            else:
-                print(f"{self.bp_print_timestamp()} | FALSE: Sorting column by {asc_or_desc} order NOT verified.")
-            print("Original list:")
-            for item in original_list:
-                print(item)
-            print("Sorted list:")
-            for item in sorted_list:
-                print(item)
+            self._log(f"FALSE: Column sorting not verified in {asc_or_desc} order | Sort type: {sort_type}",
+                      description or 'unknown column')
+
+            # print data for debugging purposes
+            print("=====ORIGINAL LIST=====")
+            for i, item in enumerate(original_list, 1):
+                print(f"    {i} | {item}")
+
+            print("=====EXPECTED SORTED LIST=====")
+            for i, item in enumerate(sorted_list, 1):
+                print(f"    {i} | {item}")
+
             return False
 
     def bp_switch_to_frame(self, iframe):
-        self.wait.until(expected_conditions.frame_to_be_available_and_switch_to_it(iframe))
-        self.driver.switch_to.frame(iframe)
-        print(f"{self.bp_print_timestamp()} | Switch to frame: {iframe}")
+        """
+        Function to switch to a specific iframe. Web element must have the iframe HTML tag.
+        Parameters
+        ----------
+        iframe: WebElement representing the iframe to switch to.
+        """
+        try:
+            self.wait.until(expected_conditions.frame_to_be_available_and_switch_to_it(iframe))
+            self.driver.switch_to.frame(iframe)
+            self._log(f"Switched to frame {iframe}")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to switch to iframe: {e}")
+            raise
 
     def bp_switch_to_default_content(self):
-        self.driver.switch_to.default_content()
-        print(f"{self.bp_print_timestamp()} | Switch to default content")
+        """
+        Function to switch to default content.
+        """
+        try:
+            self.driver.switch_to.default_content()
+            self._log("Switch to default content.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed to switch to default content: {e}")
+            raise
 
     @property
-    def bp_get_browser_title(self):
-        print(f"{self.bp_print_timestamp()} | Browser title: {self.driver.title}")
-        return self.driver.title
+    def bp_get_browser_title(self) -> str:
+        """
+        Function to retrieve the browser title
+        Returns
+        -------
+        title: str representing the browser title
+        """
+        try:
+            title = self.driver.title
+            self._log(f"Browser title = {title}")
+            return title
+        except Exception as e:
+            self.bp_handle_error(f"Failed to get browser title: {e}")
+            raise
 
     def bp_wait_for_page_to_load(self):
-        print(f"{self.bp_print_timestamp()} | Waiting for page to load")
-        start_time = time.perf_counter()
-        self.wait.until(lambda driver: driver.execute_script("return document.readyState;") == "complete")
-        end_time = time.perf_counter()
-        print(f"{self.bp_print_timestamp} | Time elapsed for page load: {end_time - start_time}")
+        """
+        Function to wait for the page to fully load. Elapsed time printed to log.
+        """
+        try:
+            self._log("Waiting for page to load.")
+            start_time = time.perf_counter()
+            self.wait.until(lambda driver: driver.execute_script("return document.readyState;") == "complete")
+            end_time = time.perf_counter()
+            elapsed_time = end_time - start_time
+            self._log(f"Time elapsed for page load: {elapsed_time:.2f} seconds.")
+        except Exception as e:
+            self.bp_handle_error(f"Failed while waiting for page load: {e}")
 
     @staticmethod
     def bp_print_timestamp():
-        current_timestamp = datetime.now()
-        return current_timestamp
+        """
+        Returns the current timestamp
+        Returns
+        -------
+        datetime: Current timestamp.
+        """
+        return datetime.now()
 
     @staticmethod
-    def generate_random_string(string_length):
-        """Generates a random string of specified length using letters and digits."""
+    def bp_generate_random_string(string_length: int):
+        """
+        Generates a random string of specified length using letters and digits.
+        Parameters
+        ----------
+        string_length: int length of the string to generate
+
+        Returns
+        -------
+        str: random string containing letters and digits.
+        """
         characters = string.ascii_letters + string.digits  # Includes uppercase, lowercase letters, and digits
         random_string = ''.join(random.choice(characters) for _ in range(string_length))
         return random_string
 
-    def bp_verify_url(self, expected_url):
-        actual_url = self.driver.current_url
-        if actual_url == expected_url:
-            print(f"{self.bp_print_timestamp()} | URL verified: {expected_url}")
-            return True
-        else:
-            print(f"{self.bp_print_timestamp()} | URL not verified: Expected: {expected_url} | Actual: {actual_url}")
-            return False
+    def bp_verify_url(self, expected_url: str):
+        """
+        Function to verify the URL
+        Parameters
+        ----------
+        expected_url: String representing the expected URL
 
-    def bp_handle_error(self, error_text):
-        print(f"{self.bp_print_timestamp()} | ERROR: | {error_text}")
+        Returns
+        -------
+        True if the actual URL and the expected URL match, False if they do not match.
+        """
+        try:
+            actual_url = self.driver.current_url
+            is_match = actual_url == expected_url
+            if is_match:
+                self._log(f"URL verified: {expected_url}")
+            else:
+                self._log(f"URL NOT verified. Expected URL: {expected_url} | Actual URL: {actual_url}")
+            return is_match
+        except Exception as e:
+            self.bp_handle_error(f"Failed to verify URL: {e}")
+            raise
+
+    def bp_handle_error(self, error_text: str):
+        """
+        Function to handle and log errors with the stack trace.
+
+        Parameters
+        ----------
+        error_text: Description of the error.
+        """
+        timestamp = self.bp_print_timestamp()
+        print(f"{timestamp} | ERROR: {error_text}")
         traceback.print_exc()

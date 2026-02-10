@@ -1,6 +1,5 @@
 """
 Optimized SwagLabs Test Suite
-Demonstrates best practices with reusable fixtures and helper functions.
 """
 from typing import Optional, Dict
 import pytest
