@@ -528,24 +528,6 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to scroll: {e}")
             raise
 
-    # def bp_enter_random_text(self, element, text_length: Optional[int] = 15, description: Optional[str] = None):
-    #     """
-    #     Function to enter randomly generated text into a web element
-    #
-    #     Parameters
-    #     ----------
-    #     element: WebElement representing the target element
-    #     text_length: Optional parameter to set the length of random text. Default=15
-    #     description: Optional text for logging purposes. Default=None
-    #     """
-    #     self.element = element
-    #     self.element.element_to_be_clickable()
-    #     self.highlight_web_element(element)
-    #     random_text = self.bp_generate_random_string(text_length)
-    #     self.bp_write_text(element, random_text)
-    #     if description:
-    #         print(f"{self.bp_print_timestamp()} | Entered random text: {random_text} into element: {description}")
-
     @staticmethod
     def bp_return_todays_date() -> date:
         """
