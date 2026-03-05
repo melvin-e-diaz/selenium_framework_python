@@ -6,9 +6,7 @@ import traceback
 from datetime import date
 from datetime import datetime
 from typing import Optional, List
-from xmlrpc.client import DateTime
 
-from pyarrow.types import is_integer
 from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support import expected_conditions
@@ -66,7 +64,7 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # LOGGING FUNCTION
     # ============================================================================
-    def _log(self, message, description: Optional[str] = None):
+    def _log(self, message, description: Optional[str] = None) -> None:
         """
         Internal method designed to consistently log actions.
 
@@ -84,7 +82,7 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # CLICK FUNCTIONS
     # ============================================================================
-    def bp_click(self, element, description: Optional[str] = None, click_type="left"):
+    def bp_click(self, element, description: Optional[str] = None, click_type="left") -> None:
         """
         Function to handle clicking on a web element.
 
@@ -111,7 +109,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to {click_type} click {description or 'element'}: {e}")
             raise
 
-    def bp_click_and_hold(self, element, description: Optional[str] = None):
+    def bp_click_and_hold(self, element, description: Optional[str] = None) -> None:
         """
         Function to click and hold on a web element.
 
@@ -129,7 +127,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to click and hold {description or 'element'}: {e}")
             raise
 
-    def bp_release_click(self, element, description: Optional[str] = None):
+    def bp_release_click(self, element, description: Optional[str] = None) -> None:
         """
         Function to release a click that was previously held. Use in conjunction with the bp_click_and_hold() function.
 
@@ -146,7 +144,7 @@ See individual method docstrings for detailed information.
             raise
 
     def bp_mouse_hover(self, element, description: Optional[str] = None, x: Optional[int | float] = None,
-                       y: Optional[int | float] = None, ):
+                       y: Optional[int | float] = None, ) -> None:
         """
         Function to hover the mouse over a specific element with an optional offset.
 
@@ -177,7 +175,8 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # WRITE TEXT FUNCTION
     # ============================================================================
-    def bp_write_text(self, element, text, description: Optional[str] = None, clear_text: Optional[bool] = True):
+    def bp_write_text(self, element, text, description: Optional[str] = None, clear_text: Optional[bool] = True) \
+            -> None:
         """
         Function to write text to a web element.
 
@@ -204,7 +203,18 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # GET TEXT FUNCTION
     # ============================================================================
-    def bp_get_text(self, element, description: Optional[str] = None, clear_text: Optional[bool] = True) -> str:
+    def bp_get_text(self, element, description: Optional[str] = None) -> str:
+        """
+        Function to return visible text contained in a web element.
+        Parameters
+        ----------
+        element: The web element to be analyzed.
+        description: Optional description of the web element for debugging purposes
+
+        Returns
+        -------
+        str of text contained in visible element.
+        """
         try:
             element.visibility_of_element_located()
             text = element.get_text()
@@ -220,7 +230,7 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # VERIFICATION METHODS
     # ============================================================================
-    def bp_is_checked(self, element, description: Optional[str] = None):
+    def bp_is_checked(self, element, description: Optional[str] = None) -> bool:
         """
         Function to check if a checkbox element is checked.
         Parameters
@@ -242,7 +252,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Attempting to verify check/no check status failed for "
                                  f"{description or 'unknown element'}: {e}")
 
-    def bp_is_displayed(self, element, description: Optional[str] = None):
+    def bp_is_displayed(self, element, description: Optional[str] = None) -> bool:
         """
         Function to check if a web element is displayed.
         Parameters
@@ -264,7 +274,7 @@ See individual method docstrings for detailed information.
                                  f"{description or 'unknown element'}: {e}")
             raise
 
-    def bp_is_enabled(self, element, description: Optional[str] = None):
+    def bp_is_enabled(self, element, description: Optional[str] = None) -> bool:
         """
         Function to verify if the web element is enabled on the page.
 
@@ -291,7 +301,7 @@ See individual method docstrings for detailed information.
     # DROPDOWN LIST METHODS
     # ============================================================================
     def bp_select_from_dropdown_list(self, element, text_or_value, description: Optional[str] = None,
-                                     select_by_index: Optional[bool] = False):
+                                     select_by_index: Optional[bool] = False) -> None:
         """
         Function to select from a dropdown list. List defaults to selecting from a dropdown list by the value or text.
         To select by the index, set select_by_index = True
@@ -374,7 +384,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to get items from {description or 'element'}: {e}")
             raise
 
-    def bp_verify_item_present_in_dropdown_list(self, element, item, description: Optional[str] = None):
+    def bp_verify_item_present_in_dropdown_list(self, element, item, description: Optional[str] = None) -> bool:
         """
         Function to verify if an item is present in a dropdown list.
 
@@ -400,7 +410,7 @@ See individual method docstrings for detailed information.
                                  f"{description or 'unknown element'}: {e}")
             raise
 
-    def bp_deselect_all_items_from_dropdown_list(self, element, description: Optional[str] = None):
+    def bp_deselect_all_items_from_dropdown_list(self, element, description: Optional[str] = None) -> None:
         """
         Function to deselect all items from a dropdown list.
 
@@ -421,7 +431,7 @@ See individual method docstrings for detailed information.
     # ============================================================================
     # MOVE AND SCROLL METHODS
     # ============================================================================
-    def bp_move_to_element(self, element, description: Optional[str] = None):
+    def bp_move_to_element(self, element, description: Optional[str] = None) -> None:
         """
         Function to move the screen to the target element.
 
@@ -439,7 +449,7 @@ See individual method docstrings for detailed information.
             raise
 
     def bp_scroll(self, direction: Optional[str] = None, amount: Optional[int] = None, x: Optional[int] = None,
-                  y: Optional[int] = None, element=None):
+                  y: Optional[int] = None, element=None) -> None:
         """
         Unified scroll function that handles all scroll operations.
 
@@ -546,7 +556,7 @@ See individual method docstrings for detailed information.
         """
         return date.today()
 
-    def bp_handle_alert(self, dismiss: Optional[bool] = False):
+    def bp_handle_alert(self, dismiss: Optional[bool] = False) -> None:
         """
         Function to handle a popup alert. Set dismiss=False to dismiss the alert, otherwise the alert will be accepted.
 
@@ -571,7 +581,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to handle alert: {e}")
             raise
 
-    def bp_switch_to_new_window(self, num_windows_open: Optional[int] = 0):
+    def bp_switch_to_new_window(self, num_windows_open: Optional[int] = 0) -> None:
         """
         Function to switch driver to a new window.
 
@@ -588,7 +598,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to switch to new window: {e}")
             raise
 
-    def bp_close_popup_window(self, num_windows_to_be_open: Optional[int] = 1):
+    def bp_close_popup_window(self, num_windows_to_be_open: Optional[int] = 1) -> None:
         """
         Function to close a popup window
 
@@ -609,7 +619,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to close popup window: {e}")
             raise
 
-    def bp_browser_back(self):
+    def bp_browser_back(self) -> None:
         """
         Function to select Back in the web browser.
         """
@@ -620,7 +630,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to navigate back in the browser: {e}")
             raise
 
-    def bp_browser_forward(self):
+    def bp_browser_forward(self) -> None:
         """
         Function to navigate forward in the web browser.
         """
@@ -630,7 +640,7 @@ See individual method docstrings for detailed information.
         except Exception as e:
             self.bp_handle_error(f"Failed to navigate forward in the browser: {e}")
 
-    def bp_browser_refresh(self):
+    def bp_browser_refresh(self) -> None:
         """
         Function to refresh the browser window.
         """
@@ -640,7 +650,7 @@ See individual method docstrings for detailed information.
         except Exception as e:
             self.bp_handle_error(f"Failed to refresh the browser: {e}")
 
-    def bp_browser_close(self):
+    def bp_browser_close(self) -> None:
         """
         Function to close the browser window.
         """
@@ -712,7 +722,7 @@ See individual method docstrings for detailed information.
 
             return False
 
-    def bp_switch_to_frame(self, iframe):
+    def bp_switch_to_frame(self, iframe) -> None:
         """
         Function to switch to a specific iframe. Web element must have the iframe HTML tag.
         Parameters
@@ -727,7 +737,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to switch to iframe: {e}")
             raise
 
-    def bp_switch_to_default_content(self):
+    def bp_switch_to_default_content(self) -> None:
         """
         Function to switch to default content.
         """
@@ -754,7 +764,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to get browser title: {e}")
             raise
 
-    def bp_wait_for_page_to_load(self):
+    def bp_wait_for_page_to_load(self) -> None:
         """
         Function to wait for the page to fully load. Elapsed time printed to log.
         """
@@ -769,7 +779,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed while waiting for page load: {e}")
 
     @staticmethod
-    def bp_print_timestamp():
+    def bp_print_timestamp() -> datetime:
         """
         Returns the current timestamp
         Returns
@@ -779,7 +789,7 @@ See individual method docstrings for detailed information.
         return datetime.now()
 
     @staticmethod
-    def bp_generate_random_string(string_length: int):
+    def bp_generate_random_string(string_length: int) -> str:
         """
         Generates a random string of specified length using letters and digits.
         Parameters
@@ -794,7 +804,7 @@ See individual method docstrings for detailed information.
         random_string = ''.join(random.choice(characters) for _ in range(string_length))
         return random_string
 
-    def bp_verify_url(self, expected_url: str):
+    def bp_verify_url(self, expected_url: str) -> bool:
         """
         Function to verify the URL
         Parameters
@@ -817,7 +827,7 @@ See individual method docstrings for detailed information.
             self.bp_handle_error(f"Failed to verify URL: {e}")
             raise
 
-    def bp_handle_error(self, error_text: str):
+    def bp_handle_error(self, error_text: str) -> None:
         """
         Function to handle and log errors with the stack trace.
 
