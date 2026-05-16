@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "userName": "standard_user",
+      "password": "secret_sauce"
+    },
+    {
+      "userName": "visual_user",
+      "password": "secret_sauce"
+    }
+  ]
+}

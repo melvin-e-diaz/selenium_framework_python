@@ -1,0 +1,5 @@
+pytest
+selenium
+pytest-html
+selenium-page-factory
+openpyxl
