@@ -5,10 +5,11 @@ import random
 import string
 import time
 import traceback
+from contextlib import contextmanager
 from datetime import date
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Any, Dict, Union, Tuple
+from typing import Optional, List, Any, Dict, Union, Tuple, Generator
 
 from selenium.common import TimeoutException
 from selenium.webdriver import ActionChains
@@ -31,6 +32,16 @@ try:
     import pyarrow as pa  # type: ignore
 except ModuleNotFoundError:  # pragma: no cover
     pa = None  # type: ignore
+
+DEFAULT_PERF_BUDGETS: Dict[str, float] = {
+    "ttfb": 800,
+    "first_contentful_paint": 1800,
+    "dom_content_loaded": 3000,
+    "load_complete": 5000,
+    "lcp": 2500,
+    "cls": 0.1,
+    "inp": 200,
+}
 
 
 class BasePage(PageFactory):
@@ -84,6 +95,12 @@ See individual method docstrings for detailed information.
         self._tracing_started = False
         self._trace_meta: Dict[str, Any] = {}
         self._window_history: List[str] = []
+        self._soft_assert_failures: List[str] = []
+        self._perf_marks: Dict[str, float] = {}
+        self._perf_entries: List[Dict[str, Any]] = []
+
+    _API_METHODS_VALID = {"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"}
+    _API_METHODS_WITH_BODY = {"POST", "PUT", "PATCH"}
 
     # ============================================================================
     # LOGGING FUNCTION
@@ -183,6 +200,16 @@ See individual method docstrings for detailed information.
             .replace(" ", "_")
             .replace(":", "_")
         )
+
+    def _record_soft_assert_failure(self, message: str, description: Optional[str] = None) -> None:
+        full_message = f"{message} | Context: {description}" if description else message
+        self._soft_assert_failures.append(full_message)
+        self._log(f"SOFT ASSERT FAIL: {message}", description)
+
+    def bp_consume_soft_assert_failures(self) -> List[str]:
+        failures = list(self._soft_assert_failures)
+        self._soft_assert_failures.clear()
+        return failures
 
     def _resolve_locator(self, element) -> Optional[Tuple[str, str]]:
         if isinstance(element, tuple) and len(element) == 2:
@@ -1369,8 +1396,294 @@ See individual method docstrings for detailed information.
             raise
 
     # ============================================================================
+    # PERFORMANCE METRICS
+    # ============================================================================
+    def bp_capture_navigation_metrics(self) -> Dict[str, Optional[float]]:
+        """Collect Navigation Timing and Paint metrics from the current page."""
+        try:
+            metrics: Dict[str, Optional[float]] = self.driver.execute_script(
+                """
+                const nav = performance.getEntriesByType('navigation')[0];
+                const paint = performance.getEntriesByType('paint');
+                if (!nav) return {};
+
+                const fp  = paint.find(e => e.name === 'first-paint');
+                const fcp = paint.find(e => e.name === 'first-contentful-paint');
+
+                return {
+                    ttfb: nav.responseStart - nav.requestStart,
+                    dns_lookup: nav.domainLookupEnd - nav.domainLookupStart,
+                    tcp_connect: nav.connectEnd - nav.connectStart,
+                    ssl_handshake: nav.secureConnectionStart > 0
+                        ? nav.connectEnd - nav.secureConnectionStart
+                        : null,
+                    redirect_time: nav.redirectEnd - nav.redirectStart,
+                    dom_content_loaded: nav.domContentLoadedEventEnd - nav.startTime,
+                    load_complete: nav.loadEventEnd - nav.startTime,
+                    first_paint: fp ? fp.startTime : null,
+                    first_contentful_paint: fcp ? fcp.startTime : null
+                };
+                """
+            )
+            self._log(
+                f"Navigation metrics captured | TTFB={metrics.get('ttfb', 'N/A')}ms "
+                f"| FCP={metrics.get('first_contentful_paint', 'N/A')}ms "
+                f"| Load={metrics.get('load_complete', 'N/A')}ms"
+            )
+            return metrics
+        except Exception as e:
+            self.bp_handle_error(f"Failed to capture navigation metrics: {e}")
+            raise
+
+    def bp_perf_mark(self, label: str) -> float:
+        """Record a named performance timestamp in monotonic milliseconds."""
+        ts = time.monotonic() * 1000
+        self._perf_marks[label] = ts
+        self._log(f"Perf mark set: '{label}'")
+        return ts
+
+    def bp_perf_measure(
+        self,
+        label: str,
+        start_mark: str,
+        end_mark: Optional[str] = None,
+    ) -> float:
+        """Measure elapsed time between two marks and persist the measurement entry."""
+        if start_mark not in self._perf_marks:
+            raise KeyError(f"Perf mark '{start_mark}' has not been set.")
+        start_ts = self._perf_marks[start_mark]
+        end_ts = self._perf_marks[end_mark] if end_mark else time.monotonic() * 1000
+        duration = end_ts - start_ts
+        entry = {
+            "label": label,
+            "start_mark": start_mark,
+            "end_mark": end_mark or "__now__",
+            "duration_ms": round(duration, 2),
+            "timestamp": datetime.now().isoformat(),
+        }
+        self._perf_entries.append(entry)
+        self._log(f"Perf measure | '{label}' = {duration:.2f}ms")
+        return duration
+
+    @contextmanager
+    def bp_time_action(
+        self,
+        label: str,
+        warn_threshold_ms: Optional[float] = None,
+    ) -> Generator[None, None, None]:
+        """Context manager that times action blocks and stores performance entries."""
+        start = time.monotonic() * 1000
+        try:
+            yield
+        finally:
+            duration = time.monotonic() * 1000 - start
+            entry = {
+                "label": label,
+                "duration_ms": round(duration, 2),
+                "timestamp": datetime.now().isoformat(),
+            }
+            self._perf_entries.append(entry)
+            msg = f"Action timed | '{label}' = {duration:.2f}ms"
+            if warn_threshold_ms is not None and duration > warn_threshold_ms:
+                self._log(f"WARNING: {msg} (threshold={warn_threshold_ms}ms)")
+            else:
+                self._log(msg)
+
+    def bp_assert_performance_budgets(
+        self,
+        metrics: Dict[str, Optional[float]],
+        budgets: Optional[Dict[str, float]] = None,
+        soft_assertion: bool = False,
+    ) -> List[str]:
+        """Assert provided metrics against configured performance budgets."""
+        active_budgets = budgets or DEFAULT_PERF_BUDGETS
+        violations: List[str] = []
+
+        for metric, limit in active_budgets.items():
+            value = metrics.get(metric)
+            if value is None:
+                continue
+            if value > limit:
+                msg = f"Budget exceeded | {metric}: {value:.2f} > {limit}"
+                violations.append(msg)
+                if soft_assertion:
+                    self._record_soft_assert_failure(msg)
+                else:
+                    self._log(f"PERF BUDGET FAIL: {msg}")
+
+        if violations and not soft_assertion:
+            raise AssertionError("Performance budget violation(s):\n" + "\n".join(violations))
+
+        if not violations:
+            self._log("All performance budgets passed.")
+
+        return violations
+
+    def bp_dump_performance_report(
+        self,
+        artifacts_dir: Union[str, Path],
+        test_name: str,
+        navigation_metrics: Optional[Dict[str, Any]] = None,
+        web_vitals: Optional[Dict[str, Any]] = None,
+        network_log: Optional[List[Dict[str, Any]]] = None,
+        network_summary: Optional[Dict[str, Any]] = None,
+        budget_violations: Optional[List[str]] = None,
+    ) -> Dict[str, str]:
+        """Persist collected performance data to json artifacts."""
+        root = Path(artifacts_dir)
+        root.mkdir(parents=True, exist_ok=True)
+        safe = self._safe_filename(test_name)
+        outputs: Dict[str, str] = {}
+        run_ts = datetime.now().isoformat()
+
+        def _write(suffix: str, data: Any) -> str:
+            path = root / f"{safe}.{suffix}.json"
+            path.write_text(json.dumps(data, indent=2, default=str) + "\n", encoding="utf-8")
+            return str(path)
+
+        if navigation_metrics:
+            outputs["navigation"] = _write(
+                "perf_navigation",
+                {
+                    "captured_at": run_ts,
+                    "url": self.driver.current_url,
+                    "metrics": navigation_metrics,
+                },
+            )
+
+        if web_vitals:
+            outputs["vitals"] = _write(
+                "perf_vitals",
+                {
+                    "captured_at": run_ts,
+                    "url": self.driver.current_url,
+                    "vitals": web_vitals,
+                },
+            )
+
+        if self._perf_entries:
+            outputs["actions"] = _write(
+                "perf_actions",
+                {
+                    "captured_at": run_ts,
+                    "entries": self._perf_entries,
+                    "total_actions": len(self._perf_entries),
+                    "slowest_action": max(self._perf_entries, key=lambda e: e["duration_ms"]),
+                },
+            )
+
+        if network_log:
+            outputs["network"] = _write(
+                "perf_network",
+                {
+                    "captured_at": run_ts,
+                    "requests": network_log,
+                },
+            )
+
+        outputs["summary"] = _write(
+            "perf_summary",
+            {
+                "test_name": test_name,
+                "captured_at": run_ts,
+                "url": self.driver.current_url,
+                "navigation_metrics": navigation_metrics,
+                "web_vitals": web_vitals,
+                "action_timings": self._perf_entries,
+                "network_summary": network_summary,
+                "budget_violations": budget_violations or [],
+                "passed_budgets": not bool(budget_violations),
+            },
+        )
+
+        self._log(
+            f"Performance report written | {len(outputs)} file(s) "
+            f"| violations={len(budget_violations or [])}"
+        )
+        return outputs
+
+    # ============================================================================
     # API ACCESS METHODS
     # ============================================================================
+    def bp_call_api(
+        self,
+        method: str,
+        dataset_url: Optional[str] = None,
+        rid: Optional[str] = None,
+        bearer_token: Optional[str] = None,
+        payload: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict[str, Any]] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+        timeout: Optional[int] = None,
+        description: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Send an API request and return a normalized response object."""
+        method_upper = method.upper()
+        if method_upper not in self._API_METHODS_VALID:
+            raise ValueError(
+                f"Unsupported HTTP method '{method}'. "
+                f"Must be one of: {sorted(self._API_METHODS_VALID)}"
+            )
+
+        if requests is None:
+            raise ModuleNotFoundError("bp_call_api requires the optional dependency 'requests'.")
+
+        dataset_url = dataset_url or getattr(config, "DATASET_URL", None) or os.getenv("DATASET_URL")
+        rid = rid or getattr(config, "RID", None) or os.getenv("RID")
+        bearer_token = bearer_token or getattr(config, "BEARER_TOKEN", None) or os.getenv("BEARER_TOKEN")
+        effective_timeout = timeout or 30
+
+        if not dataset_url or not bearer_token:
+            raise ValueError("dataset_url and bearer_token must be provided (argument, config, or env var).")
+        url = f"{dataset_url}/{rid}" if rid else dataset_url
+
+        headers: Dict[str, str] = {"Authorization": f"Bearer {bearer_token}"}
+        if method_upper in self._API_METHODS_WITH_BODY:
+            headers["Content-Type"] = "application/json"
+        if extra_headers:
+            headers.update(extra_headers)
+
+        self._log(f"API {method_upper} request", description or url)
+
+        try:
+            response = requests.request(
+                method=method_upper,
+                url=url,
+                headers=headers,
+                json=payload if method_upper in self._API_METHODS_WITH_BODY else None,
+                params=params,
+                timeout=effective_timeout,
+            )
+            response.raise_for_status()
+            elapsed_ms = round(response.elapsed.total_seconds() * 1000, 2)
+
+            body: Any = None
+            if method_upper != "HEAD" and response.status_code != 204:
+                content_type = response.headers.get("Content-Type", "")
+                if "application/json" in content_type:
+                    body = response.json()
+                else:
+                    body = response.text
+
+            result: Dict[str, Any] = {
+                "status_code": response.status_code,
+                "headers": dict(response.headers),
+                "body": body,
+                "url": response.url,
+                "elapsed_ms": elapsed_ms,
+            }
+            self._log(
+                f"API {method_upper} succeeded | status={response.status_code} "
+                f"| elapsed={elapsed_ms}ms",
+                description or url,
+            )
+            return result
+        except Exception as e:
+            self.bp_handle_error(
+                f"API request failed on {method_upper} {url} for {description or 'unknown endpoint'}: {e}"
+            )
+            raise
+
     def bp_return_api_data(self, dataset_url: Optional[str] = None, rid: Optional[str] = None,
                            bearer_token: Optional[str] = None, description: Optional[str] = None) -> Any:
         """
@@ -1411,27 +1724,16 @@ See individual method docstrings for detailed information.
         """
         Send a POST request with JSON payload and return response dict.
         """
-        dataset_url = dataset_url or getattr(config, "DATASET_URL", None) or os.getenv("DATASET_URL")
-        rid = rid or getattr(config, "RID", None) or os.getenv("RID")
-        bearer_token = bearer_token or getattr(config, "BEARER_TOKEN", None) or os.getenv("BEARER_TOKEN")
-
         try:
-            if requests is None:
-                raise ModuleNotFoundError("API helpers require optional dependency 'requests'.")
-            if not dataset_url or not rid or not bearer_token:
-                raise ValueError("dataset_url, rid, and bearer_token must be provided (argument, config, or env var).")
-
-            self._log("Posting API data", description or "unknown dataset")
-            headers = {
-                "Authorization": f"Bearer {bearer_token}",
-                "Content-Type": "application/json",
-            }
-            url = f"{dataset_url}/{rid}"
-            response = requests.post(url, headers=headers, json=payload)
-            response.raise_for_status()
-            response_body = response.json()
-            self._log("Successfully posted API data and received response", description or "unknown dataset")
-            return response_body
+            result = self.bp_call_api(
+                method="POST",
+                dataset_url=dataset_url,
+                rid=rid,
+                bearer_token=bearer_token,
+                payload=payload,
+                description=description,
+            )
+            return result["body"] if isinstance(result["body"], dict) else {"data": result["body"]}
         except Exception as e:
             self.bp_handle_error(f"Failed to post API data for {description or 'unknown dataset'}: {e}")
             raise
