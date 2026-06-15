@@ -1,5 +1,6 @@
 import os
-from datetime import time, datetime
+import time
+from datetime import datetime
 
 import pytest
 
@@ -91,8 +92,12 @@ def test_failed_check(request):
         print("setting up a test failed!", request.node.nodeid)
     elif request.node.rep_setup.passed:
         if request.node.rep_call.failed:
-            driver = request.node.funcargs['selenium_driver']
-            take_screenshot(driver, request.node.nodeid)
+            active_driver = request.node.funcargs.get('selenium_driver') or request.node.funcargs.get('setup')
+            if active_driver is not None:
+                try:
+                    take_screenshot(active_driver, request.node.nodeid)
+                except Exception as screenshot_error:
+                    print(f"WARNING: Failed to capture screenshot for {request.node.nodeid}: {screenshot_error}")
             print("executing test failed", request.node.nodeid)
 
 

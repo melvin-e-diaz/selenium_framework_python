@@ -131,17 +131,18 @@ class InventoryPage(BasePage):
 
     def verify_products_header_displayed(self) -> bool:
         """Verify products header is displayed."""
-        return self.bp_is_displayed(self._products_header, "Products Header")
+        return self.bp_is_displayed(self.productsHeader, "Products Header")
 
     def verify_sort_dropdown_enabled(self) -> bool:
         """Verify sort dropdown is enabled and contains correct options."""
-        if not self.bp_is_enabled(self._product_sort_dropdown, "Product Sort Dropdown"):
+        if not self.bp_is_enabled(self.productSortDropdown, "Product Sort Dropdown"):
             return False
 
-        actual_options = self.bp_get_all_items_from_dropdown_list(
-            self._product_sort_dropdown,
+        actual_options_raw = self.bp_get_items_from_dropdown_list(
+            self.productSortDropdown,
             "Product Sort Dropdown"
         )
+        actual_options = [str(option).strip() for option in actual_options_raw]
         expected_options = list(self.SORT_OPTIONS.values())
 
         return actual_options == expected_options
@@ -165,20 +166,26 @@ class InventoryPage(BasePage):
             bool: True if all sort options work, False otherwise
         """
         sort_tests = [
-            (self.SORT_OPTIONS["name_asc"], self.inventory_item_names, "asc", "Item Names A-Z"),
-            (self.SORT_OPTIONS["name_desc"], self.inventory_item_names, "desc", "Item Names Z-A"),
-            (self.SORT_OPTIONS["price_asc"], self.inventory_item_prices, "asc", "Prices Low-High"),
-            (self.SORT_OPTIONS["price_desc"], self.inventory_item_prices, "desc", "Prices High-Low")
+            (self.SORT_OPTIONS["name_asc"], lambda: self.inventory_item_names, False, "Item Names A-Z"),
+            (self.SORT_OPTIONS["name_desc"], lambda: self.inventory_item_names, True, "Item Names Z-A"),
+            (self.SORT_OPTIONS["price_asc"], lambda: self.inventory_item_prices, False, "Prices Low-High"),
+            (self.SORT_OPTIONS["price_desc"], lambda: self.inventory_item_prices, True, "Prices High-Low")
         ]
 
-        for sort_option, elements, order, description in sort_tests:
+        for sort_option, element_supplier, reverse_sort, description in sort_tests:
             self.bp_select_from_dropdown_list(
-                self._product_sort_dropdown,
+                self.productSortDropdown,
                 sort_option,
                 "Product Sort Dropdown"
             )
 
-            if not self.bp_verify_column_sorting(elements, order, description):
+            is_sorted = self.bp_verify_column_sorting(
+                element_supplier(),
+                description=description,
+                reverse_sort=reverse_sort,
+                sort_type="numeric" if "Prices" in description else "string",
+            )
+            if is_sorted is False:
                 print(f"Sort verification failed for: {description}")
                 return False
 
