@@ -121,15 +121,41 @@ See individual method docstrings for detailed information.
             print(f"{timestamp} | {message}")
 
     def bp_artifacts_root(self, artifacts_dir: Optional[str] = None) -> Path:
+        """
+        Return the root directory used for test artifacts.
+
+        Parameters
+        ----------
+        artifacts_dir: Optional override path for artifact output root.
+
+        Returns
+        -------
+        Path: Resolved artifact root path.
+        """
         base = artifacts_dir or os.getenv("PW_ARTIFACTS_DIR") or "playwright_artifacts"
         return Path(base)
 
     def bp_attach_runtime_listeners(self) -> None:
+        """
+        Enable runtime log collection for the current test session.
+        """
         self._runtime_listeners_attached = True
         self._runtime_logs = {"console": [], "pageerror": [], "requestfailed": []}
         self._log("Runtime log capture enabled.")
 
     def bp_dump_runtime_logs(self, artifacts_dir: Union[str, Path], test_name: str) -> Dict[str, str]:
+        """
+        Persist collected runtime logs and metadata to artifact files.
+
+        Parameters
+        ----------
+        artifacts_dir: Directory where runtime log artifacts should be written.
+        test_name: Test name used to generate safe artifact file names.
+
+        Returns
+        -------
+        Dict[str, str]: Mapping of runtime artifact type to file path.
+        """
         root = Path(artifacts_dir)
         root.mkdir(parents=True, exist_ok=True)
         safe = self._safe_filename(test_name)
@@ -169,6 +195,16 @@ See individual method docstrings for detailed information.
         snapshots: bool = True,
         sources: bool = True,
     ) -> None:
+        """
+        Start trace metadata tracking for the active test.
+
+        Parameters
+        ----------
+        name: Logical name for the trace session.
+        screenshots: Whether screenshot capture is enabled for trace metadata.
+        snapshots: Whether DOM snapshots are enabled for trace metadata.
+        sources: Whether source capture is enabled for trace metadata.
+        """
         self._tracing_started = True
         self._trace_meta = {
             "name": name,
@@ -179,6 +215,17 @@ See individual method docstrings for detailed information.
         }
 
     def bp_stop_tracing(self, file_path: Optional[Union[str, Path]] = None) -> Optional[str]:
+        """
+        Stop tracing and optionally write trace metadata to disk.
+
+        Parameters
+        ----------
+        file_path: Optional file path where trace metadata should be persisted.
+
+        Returns
+        -------
+        Optional[str]: Persisted trace metadata file path when written, otherwise None.
+        """
         if not self._tracing_started:
             return None
         self._tracing_started = False
@@ -193,6 +240,17 @@ See individual method docstrings for detailed information.
 
     @staticmethod
     def _safe_filename(value: str) -> str:
+        """
+        Convert arbitrary text into a filesystem-safe filename token.
+
+        Parameters
+        ----------
+        value: Raw text value to sanitize for filesystem usage.
+
+        Returns
+        -------
+        str: Sanitized filename-safe token.
+        """
         return (
             value.replace("/", "_")
             .replace("\\", "_")
@@ -202,16 +260,42 @@ See individual method docstrings for detailed information.
         )
 
     def _record_soft_assert_failure(self, message: str, description: Optional[str] = None) -> None:
+        """
+        Store a soft-assert failure message for deferred test failure reporting.
+
+        Parameters
+        ----------
+        message: Failure message to store.
+        description: Optional context description to append to the failure message.
+        """
         full_message = f"{message} | Context: {description}" if description else message
         self._soft_assert_failures.append(full_message)
         self._log(f"SOFT ASSERT FAIL: {message}", description)
 
     def bp_consume_soft_assert_failures(self) -> List[str]:
+        """
+        Return and clear accumulated soft-assert failures.
+
+        Returns
+        -------
+        List[str]: Collected soft-assert failure messages prior to clearing.
+        """
         failures = list(self._soft_assert_failures)
         self._soft_assert_failures.clear()
         return failures
 
     def _resolve_locator(self, element) -> Optional[Tuple[str, str]]:
+        """
+        Resolve supported element inputs into a Selenium locator tuple when possible.
+
+        Parameters
+        ----------
+        element: Element-like input (tuple, css string, or page object wrapper) to resolve.
+
+        Returns
+        -------
+        Optional[Tuple[str, str]]: Selenium locator tuple if resolvable, otherwise None.
+        """
         if isinstance(element, tuple) and len(element) == 2:
             return element
         if isinstance(element, str):
@@ -222,6 +306,17 @@ See individual method docstrings for detailed information.
         return None
 
     def _resolve_web_element(self, element):
+        """
+        Resolve supported element references to a single concrete WebElement.
+
+        Parameters
+        ----------
+        element: Element-like input to resolve to a concrete WebElement.
+
+        Returns
+        -------
+        Any: Resolved WebElement when available, otherwise the original object.
+        """
         if isinstance(element, WebElement):
             return element
         if isinstance(element, tuple) and len(element) == 2:
@@ -241,6 +336,17 @@ See individual method docstrings for detailed information.
         return element
 
     def _resolve_web_elements(self, element) -> List[WebElement]:
+        """
+        Resolve supported element references to a list of concrete WebElements.
+
+        Parameters
+        ----------
+        element: Element-like input to resolve into one or more web elements.
+
+        Returns
+        -------
+        List[WebElement]: Resolved list of WebElement instances.
+        """
         locator = self._resolve_locator(element)
         if locator is not None:
             return self.driver.find_elements(*locator)
@@ -347,6 +453,12 @@ See individual method docstrings for detailed information.
     def bp_drag_and_drop(self, source, target, description: Optional[str] = None) -> None:
         """
         Function to drag a source element and drop it on a target element.
+
+        Parameters
+        ----------
+        source: Source element to drag.
+        target: Target element where source should be dropped.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             source_element = self._resolve_web_element(source)
@@ -416,6 +528,16 @@ See individual method docstrings for detailed information.
     def bp_get_element_attribute(self, element, attribute: str, description: Optional[str] = None) -> Optional[str]:
         """
         Function to return an attribute value from a web element.
+
+        Parameters
+        ----------
+        element: Web element (or supported element reference) to inspect.
+        attribute: Attribute name to retrieve.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        Optional[str]: Retrieved attribute value, or None when not present.
         """
         try:
             target = self._resolve_web_element(element)
@@ -429,6 +551,12 @@ See individual method docstrings for detailed information.
     def bp_press_key(self, key: str, element=None, description: Optional[str] = None) -> None:
         """
         Function to press a key on an element or the active page.
+
+        Parameters
+        ----------
+        key: Keyboard key/value to send.
+        element: Optional target element. If None, key is sent to the active page context.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             if element is not None:
@@ -444,6 +572,11 @@ See individual method docstrings for detailed information.
     def bp_clear_input(self, element, description: Optional[str] = None) -> None:
         """
         Forcefully clear an input using Ctrl+A and Delete.
+
+        Parameters
+        ----------
+        element: Input element (or supported element reference) to clear.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             target = self._resolve_web_element(element)
@@ -529,6 +662,17 @@ See individual method docstrings for detailed information.
                     tolerance: Optional[float] = None) -> bool:
         """
         Compare text values of two elements, optionally using a numeric tolerance.
+
+        Parameters
+        ----------
+        element1: First element in comparison.
+        element2: Second element in comparison.
+        description: Optional description for logging purposes. Default=None
+        tolerance: Optional numeric tolerance used for numeric comparisons.
+
+        Returns
+        -------
+        bool: True when comparison criteria are met, otherwise False.
         """
         try:
             text1 = self.bp_get_text(element1, description=f"{description} [element1]" if description else "element1")
@@ -565,6 +709,17 @@ See individual method docstrings for detailed information.
                                 case_sensitive: bool = True) -> bool:
         """
         Verify an element's text contains expected text.
+
+        Parameters
+        ----------
+        element: Element to inspect.
+        expected_text: Text expected to be present in the element.
+        description: Optional description for logging purposes. Default=None
+        case_sensitive: Whether text matching should be case-sensitive. Default=True
+
+        Returns
+        -------
+        bool: True when expected text is present, otherwise False.
         """
         try:
             actual_text = self.bp_get_text(element, description=description)
@@ -581,6 +736,16 @@ See individual method docstrings for detailed information.
     def bp_verify_element_count(self, element, expected_count: int, description: Optional[str] = None) -> bool:
         """
         Verify number of elements located equals expected_count.
+
+        Parameters
+        ----------
+        element: Locator/element reference that resolves to one or more elements.
+        expected_count: Expected number of matched elements.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        bool: True when actual count equals expected_count, otherwise False.
         """
         try:
             actual_count = len(self._resolve_web_elements(element))
@@ -597,6 +762,18 @@ See individual method docstrings for detailed information.
                             contains: bool = False) -> bool:
         """
         Verify an element attribute equals or contains expected value.
+
+        Parameters
+        ----------
+        element: Element to inspect.
+        attribute: Attribute name to evaluate.
+        expected_value: Expected attribute value or substring.
+        description: Optional description for logging purposes. Default=None
+        contains: When True, performs a contains check instead of exact equality.
+
+        Returns
+        -------
+        bool: True when attribute check passes, otherwise False.
         """
         try:
             actual_value = self.bp_get_element_attribute(element, attribute, description=description) or ""
@@ -617,6 +794,13 @@ See individual method docstrings for detailed information.
                             timeout: Optional[int] = None) -> None:
         """
         Wait for an element to reach a specific state.
+
+        Parameters
+        ----------
+        element: Element or locator reference to wait on.
+        state: Target state to wait for (visible, hidden, attached, detached). Default=visible
+        description: Optional description for logging purposes. Default=None
+        timeout: Optional override timeout in seconds.
         """
         valid_states = {"visible", "hidden", "attached", "detached"}
         if state not in valid_states:
@@ -655,6 +839,18 @@ See individual method docstrings for detailed information.
                                     timeout: Optional[int] = None, case_sensitive: bool = True) -> bool:
         """
         Wait until an element's text contains expected_text.
+
+        Parameters
+        ----------
+        element: Element whose text will be evaluated.
+        expected_text: Text expected to appear in the element.
+        description: Optional description for logging purposes. Default=None
+        timeout: Optional override timeout in seconds.
+        case_sensitive: Whether text matching should be case-sensitive. Default=True
+
+        Returns
+        -------
+        bool: True when text appears before timeout.
         """
         effective_wait = WebDriverWait(self.driver, timeout or self.wait_timeout)
         try:
@@ -676,6 +872,16 @@ See individual method docstrings for detailed information.
                                    timeout: Optional[int] = None) -> bool:
         """
         Wait until current URL contains expected_fragment.
+
+        Parameters
+        ----------
+        expected_fragment: URL fragment expected to appear in current browser URL.
+        description: Optional description for logging purposes. Default=None
+        timeout: Optional override timeout in seconds.
+
+        Returns
+        -------
+        bool: True when URL fragment appears before timeout.
         """
         effective_wait = WebDriverWait(self.driver, timeout or self.wait_timeout)
         try:
@@ -922,6 +1128,12 @@ See individual method docstrings for detailed information.
     def bp_scroll_to_element(self, element, scroll_container=None, description: Optional[str] = None) -> None:
         """
         Scroll to an element, optionally inside a scroll container.
+
+        Parameters
+        ----------
+        element: Target element to scroll into view.
+        scroll_container: Optional scrollable container element. If omitted, page-level scrolling is used.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             target = self._resolve_web_element(element)
@@ -942,6 +1154,13 @@ See individual method docstrings for detailed information.
                                  description: Optional[str] = None) -> None:
         """
         Scroll to coordinates in the page or a scrollable container.
+
+        Parameters
+        ----------
+        x: Horizontal coordinate to scroll to.
+        y: Vertical coordinate to scroll to.
+        scroll_container: Optional scrollable container element. If omitted, page-level scrolling is used.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             if scroll_container is not None:
@@ -958,6 +1177,13 @@ See individual method docstrings for detailed information.
                                description: Optional[str] = None) -> None:
         """
         Scroll by direction in the page or a scrollable container.
+
+        Parameters
+        ----------
+        direction: Scroll direction (top, bottom, up, down, left, right).
+        amount: Optional scroll distance used for directional scroll operations.
+        scroll_container: Optional scrollable container element. If omitted, page-level scrolling is used.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             direction = direction.lower()
@@ -992,6 +1218,12 @@ See individual method docstrings for detailed information.
     def bp_upload_file(self, element, file_path: Union[str, List[str]], description: Optional[str] = None) -> None:
         """
         Upload one or more files via a file input element.
+
+        Parameters
+        ----------
+        element: File input element that receives the upload path(s).
+        file_path: Single file path or list of file paths to upload.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             target = self._resolve_web_element(element)
@@ -1006,6 +1238,17 @@ See individual method docstrings for detailed information.
                          timeout: Optional[int] = None) -> str:
         """
         Trigger a download and return the expected output path.
+
+        Parameters
+        ----------
+        trigger_element: Element that initiates the download when clicked.
+        save_as: Optional expected download path. If omitted, a timestamped path is generated.
+        description: Optional description for logging purposes. Default=None
+        timeout: Optional override timeout in seconds while waiting for the file to exist.
+
+        Returns
+        -------
+        str: Expected download file path.
         """
         try:
             target = self._resolve_web_element(trigger_element)
@@ -1029,6 +1272,17 @@ See individual method docstrings for detailed information.
                            full_page: bool = False) -> str:
         """
         Capture screenshot of the page or a specific element.
+
+        Parameters
+        ----------
+        file_path: Optional output path for screenshot file.
+        element: Optional element to capture. If None, captures current page viewport.
+        description: Optional description for logging purposes. Default=None
+        full_page: Reserved flag for full-page capture behavior.
+
+        Returns
+        -------
+        str: Screenshot output file path.
         """
         try:
             if file_path is None:
@@ -1140,6 +1394,11 @@ See individual method docstrings for detailed information.
     def bp_navigate_to_url(self, url: str, description: Optional[str] = None) -> None:
         """
         Navigate to a URL and wait for page load.
+
+        Parameters
+        ----------
+        url: Destination URL to navigate to.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             self._log(f"Navigating to URL: {url}", description or "unknown page")
@@ -1194,6 +1453,15 @@ See individual method docstrings for detailed information.
     def bp_get_cookie(self, name: str, description: Optional[str] = None) -> Optional[Dict[str, Any]]:
         """
         Return cookie by name.
+
+        Parameters
+        ----------
+        name: Cookie name to retrieve.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        Optional[Dict[str, Any]]: Cookie dictionary when found, otherwise None.
         """
         try:
             cookie = self.driver.get_cookie(name)
@@ -1209,6 +1477,11 @@ See individual method docstrings for detailed information.
     def bp_set_cookie(self, cookie: Dict[str, Any], description: Optional[str] = None) -> None:
         """
         Add or overwrite a cookie.
+
+        Parameters
+        ----------
+        cookie: Cookie dictionary passed to Selenium's add_cookie.
+        description: Optional description for logging purposes. Default=None
         """
         try:
             self.driver.add_cookie(cookie)
@@ -1220,6 +1493,10 @@ See individual method docstrings for detailed information.
     def bp_clear_cookies(self, description: Optional[str] = None) -> None:
         """
         Clear all cookies.
+
+        Parameters
+        ----------
+        description: Optional description for logging purposes. Default=None
         """
         try:
             self.driver.delete_all_cookies()
@@ -1399,7 +1676,13 @@ See individual method docstrings for detailed information.
     # PERFORMANCE METRICS
     # ============================================================================
     def bp_capture_navigation_metrics(self) -> Dict[str, Optional[float]]:
-        """Collect Navigation Timing and Paint metrics from the current page."""
+        """
+        Collect Navigation Timing and Paint metrics from the current page.
+
+        Returns
+        -------
+        Dict[str, Optional[float]]: Navigation and paint timing metrics in milliseconds.
+        """
         try:
             metrics: Dict[str, Optional[float]] = self.driver.execute_script(
                 """
@@ -1436,7 +1719,17 @@ See individual method docstrings for detailed information.
             raise
 
     def bp_perf_mark(self, label: str) -> float:
-        """Record a named performance timestamp in monotonic milliseconds."""
+        """
+        Record a named performance timestamp in monotonic milliseconds.
+
+        Parameters
+        ----------
+        label: Unique mark label used to identify the recorded timestamp.
+
+        Returns
+        -------
+        float: Recorded timestamp in milliseconds.
+        """
         ts = time.monotonic() * 1000
         self._perf_marks[label] = ts
         self._log(f"Perf mark set: '{label}'")
@@ -1448,7 +1741,19 @@ See individual method docstrings for detailed information.
         start_mark: str,
         end_mark: Optional[str] = None,
     ) -> float:
-        """Measure elapsed time between two marks and persist the measurement entry."""
+        """
+        Measure elapsed time between two marks and persist the measurement entry.
+
+        Parameters
+        ----------
+        label: Label to assign to the measurement entry.
+        start_mark: Existing mark name used as the start timestamp.
+        end_mark: Optional existing mark name used as the end timestamp. Uses current time when omitted.
+
+        Returns
+        -------
+        float: Measured duration in milliseconds.
+        """
         if start_mark not in self._perf_marks:
             raise KeyError(f"Perf mark '{start_mark}' has not been set.")
         start_ts = self._perf_marks[start_mark]
@@ -1471,7 +1776,18 @@ See individual method docstrings for detailed information.
         label: str,
         warn_threshold_ms: Optional[float] = None,
     ) -> Generator[None, None, None]:
-        """Context manager that times action blocks and stores performance entries."""
+        """
+        Context manager that times action blocks and stores performance entries.
+
+        Parameters
+        ----------
+        label: Label assigned to the timed action entry.
+        warn_threshold_ms: Optional warning threshold in milliseconds.
+
+        Returns
+        -------
+        Generator[None, None, None]: Context manager generator for timing the wrapped action block.
+        """
         start = time.monotonic() * 1000
         try:
             yield
@@ -1495,7 +1811,19 @@ See individual method docstrings for detailed information.
         budgets: Optional[Dict[str, float]] = None,
         soft_assertion: bool = False,
     ) -> List[str]:
-        """Assert provided metrics against configured performance budgets."""
+        """
+        Assert provided metrics against configured performance budgets.
+
+        Parameters
+        ----------
+        metrics: Captured performance metrics to evaluate.
+        budgets: Optional metric-to-threshold mapping. Defaults to framework performance budgets.
+        soft_assertion: When True, records failures instead of raising immediately.
+
+        Returns
+        -------
+        List[str]: Budget violation messages, if any.
+        """
         active_budgets = budgets or DEFAULT_PERF_BUDGETS
         violations: List[str] = []
 
@@ -1529,7 +1857,23 @@ See individual method docstrings for detailed information.
         network_summary: Optional[Dict[str, Any]] = None,
         budget_violations: Optional[List[str]] = None,
     ) -> Dict[str, str]:
-        """Persist collected performance data to json artifacts."""
+        """
+        Persist collected performance data to json artifacts.
+
+        Parameters
+        ----------
+        artifacts_dir: Directory where performance artifacts should be written.
+        test_name: Test name used to generate safe artifact file names.
+        navigation_metrics: Optional navigation timing metrics payload.
+        web_vitals: Optional web vitals payload.
+        network_log: Optional raw network request log payload.
+        network_summary: Optional summarized network metrics payload.
+        budget_violations: Optional list of performance budget violations.
+
+        Returns
+        -------
+        Dict[str, str]: Mapping of generated performance artifact type to file path.
+        """
         root = Path(artifacts_dir)
         root.mkdir(parents=True, exist_ok=True)
         safe = self._safe_filename(test_name)
@@ -1617,7 +1961,25 @@ See individual method docstrings for detailed information.
         timeout: Optional[int] = None,
         description: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Send an API request and return a normalized response object."""
+        """
+        Send an API request and return a normalized response object.
+
+        Parameters
+        ----------
+        method: HTTP method (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS).
+        dataset_url: Optional base dataset URL override.
+        rid: Optional resource identifier appended to dataset_url.
+        bearer_token: Optional bearer token override.
+        payload: Optional JSON payload for body-capable methods.
+        params: Optional query string parameters.
+        extra_headers: Optional additional request headers.
+        timeout: Optional request timeout in seconds.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        Dict[str, Any]: Normalized response payload with status, headers, body, url, and elapsed time.
+        """
         method_upper = method.upper()
         if method_upper not in self._API_METHODS_VALID:
             raise ValueError(
@@ -1688,6 +2050,17 @@ See individual method docstrings for detailed information.
                            bearer_token: Optional[str] = None, description: Optional[str] = None) -> Any:
         """
         Fetch API data in ARROW format and return as DataFrame.
+
+        Parameters
+        ----------
+        dataset_url: Optional dataset URL override.
+        rid: Optional dataset record identifier override.
+        bearer_token: Optional bearer token override.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        Any: DataFrame containing returned dataset rows.
         """
         dataset_url = dataset_url or getattr(config, "DATASET_URL", None) or os.getenv("DATASET_URL")
         rid = rid or getattr(config, "RID", None) or os.getenv("RID")
@@ -1723,6 +2096,18 @@ See individual method docstrings for detailed information.
                          bearer_token: Optional[str] = None, description: Optional[str] = None) -> Dict[str, Any]:
         """
         Send a POST request with JSON payload and return response dict.
+
+        Parameters
+        ----------
+        payload: JSON payload to post.
+        dataset_url: Optional dataset URL override.
+        rid: Optional dataset record identifier override.
+        bearer_token: Optional bearer token override.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        Dict[str, Any]: Response body dictionary or wrapped raw response payload.
         """
         try:
             result = self.bp_call_api(
@@ -1743,6 +2128,17 @@ See individual method docstrings for detailed information.
                                    description: Optional[str] = None) -> List[Dict[str, Any]]:
         """
         Fetch API data and return as list of row dictionaries.
+
+        Parameters
+        ----------
+        dataset_url: Optional dataset URL override.
+        rid: Optional dataset record identifier override.
+        bearer_token: Optional bearer token override.
+        description: Optional description for logging purposes. Default=None
+
+        Returns
+        -------
+        List[Dict[str, Any]]: List of row dictionaries converted from returned dataset data.
         """
         try:
             df = self.bp_return_api_data(dataset_url=dataset_url, rid=rid, bearer_token=bearer_token,
